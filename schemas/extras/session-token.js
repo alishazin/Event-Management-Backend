@@ -10,6 +10,6 @@ const sessionToken = mongoose.Schema({
         type: Date,
         required: true,
     }
-})
+}, { _id: false })
 
 module.exports = sessionToken

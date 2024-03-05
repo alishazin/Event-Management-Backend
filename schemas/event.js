@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 const departments = require("./extras/departments.js")
 const billSchema = require("./extras/bill.js")
 const participantSchema = require("./extras/participant.js")
+const userObj = require("./user.js")
 
 function initialize() {
 
@@ -14,9 +15,8 @@ function initialize() {
         },
         event_manager: {
             type: mongoose.Types.ObjectId,
-            required: true
+            required: false // will be invited later
         },
-        volunteers: [mongoose.Types.ObjectId],
         participants: [participantSchema],
         bills: [billSchema],
     })
@@ -26,6 +26,7 @@ function initialize() {
             type: String,
             required: true,
             trim: true,
+            lowercase: true
         },
         date_from: {
             type: Date,
@@ -33,13 +34,9 @@ function initialize() {
         },
         date_to: {
             type: Date,
-            required: true,
+            required: false, // required only if event is for multiple days
         },
         student_coordinator: {
-            type: mongoose.Types.ObjectId,
-            required: true
-        },
-        treasurer: {
             type: mongoose.Types.ObjectId,
             required: true
         },
@@ -48,7 +45,12 @@ function initialize() {
             enum: departments,
             required: true
         },
+        treasurer: {
+            type: mongoose.Types.ObjectId,
+            required: false
+        },
         sub_events: [subEventSchema],
+        volunteers: [mongoose.Types.ObjectId]
     })
 
     const EventModel = mongoose.model("Event", eventSchema)
@@ -57,4 +59,17 @@ function initialize() {
 
 }
 
-module.exports = {initialize: initialize}
+async function toObject(obj, UserModel) {
+    return {
+        id: obj.id,
+        name: obj.name,
+        date_from: obj.date_from,
+        date_to: obj.date_to ? obj.date_to : null,
+        department: obj.department,
+        student_coordinator: obj.student_coordinator ? userObj.toObject(await userObj.getById(obj.student_coordinator, UserModel)) : null,
+        treasurer: obj.treasurer ? userObj.toObject(await userObj.getById(obj.treasurer, UserModel)) : null,
+        sub_events: obj.sub_events,
+    }
+}
+
+module.exports = {initialize: initialize, toObject: toObject}

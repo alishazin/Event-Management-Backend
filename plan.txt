@@ -26,3 +26,5 @@ Participant db will have id, event_name, sub_event_name, name, personal details.
 
 Who can view the participants list (each sub event will have it):
     everyone part of the event
+
+except user, other return values will have null values filled to retain the structure
