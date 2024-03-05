@@ -14,8 +14,12 @@ const eventEndpoint = require(`${__dirname}/endpoints/event.js`)
 const pariticipantEndpoint = require(`${__dirname}/endpoints/participant.js`)
 
 // Initializing Database
-// mongoose.connect(`mongodb://127.0.0.1:27017/EventManagement`)
-mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.dhwbvao.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
+if (process.env.PORT) {
+    mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.dhwbvao.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
+} else {
+    mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.dhwbvao.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
+    // mongoose.connect(`mongodb://127.0.0.1:27017/EventManagement`)
+}
 
 // Initializing Express App
 const app = express()
