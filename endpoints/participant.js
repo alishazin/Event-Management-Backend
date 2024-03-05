@@ -171,8 +171,8 @@ function createEventEndpoint(app, UserModel, EventModel) {
 
     })
 
-    app.get("/api/participant/get", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator", "volunteer"]))
-    app.get("/api/participant/get", async (req, res) => {
+    app.post("/api/participant/get", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator", "volunteer"]))
+    app.post("/api/participant/get", async (req, res) => {
 
         const { event_id, sub_event_id, participant_id } = req.body;
 
