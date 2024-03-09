@@ -22,12 +22,12 @@ function createUserEndpoint(app, UserModel) {
     app.post("/api/auth/create-user", async (req, res) => {
 
         const {
-            type, email, password, department
+            type, email, name, password, department
         } = req.body
 
         // Required field validation
 
-        const validator = utils.validateRequired([type, email, password], ["type", "email", "password"])
+        let validator = utils.validateRequired([type, email, name, password], ["type", "email", "name", "password"])
         if (!validator.is_valid) {
             return res.status(400).send({
                 "err_msg": validator.err_msg,
@@ -73,6 +73,23 @@ function createUserEndpoint(app, UserModel) {
             "field": "email"
         })
 
+        // name validation
+
+        if (!utils.checkType(name, String)) {
+            return res.status(400).send({
+                "err_msg": "name must be a string",
+                "field": "name"
+            })
+        }
+
+        validator = utils.checkTrimmedLength(name, 3, 30, "name")
+        if (!validator.is_valid) {
+            return res.status(400).send({
+                "err_msg": validator.err_msg,
+                "field": "name"
+            })
+        }
+
         // password validation
 
         if (!utils.checkType(password, String || password.length < 8)) {
@@ -114,6 +131,7 @@ function createUserEndpoint(app, UserModel) {
         const user = UserModel({
             type: type,
             email: email,
+            name: name,
             password: hash,
             department: type === "hod" ? department : undefined
         })
@@ -275,7 +293,7 @@ function changePasswordEndpoint(app, UserModel) {
         res.locals.user.password = hash
         await res.locals.user.save()
 
-        res.status(200).send(userObj.toObject(res.locals.user))
+        res.status(200).send(userObj.toObjectres.locals.user)
 
     })
 

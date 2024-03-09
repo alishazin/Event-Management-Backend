@@ -28,3 +28,5 @@ Who can view the participants list (each sub event will have it):
     everyone part of the event
 
 except user, other return values will have null values filled to retain the structure
+
+Add event-specific position in the /verify-user

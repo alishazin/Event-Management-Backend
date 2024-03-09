@@ -185,6 +185,13 @@ function createSubEventEndpoint(app, UserModel, EventModel) {
             })
         }
 
+        if (eventObj.checkIfSubEventExist(event, name)) {
+            return res.status(400).send({
+                "err_msg": "A sub event with the same name exist",
+                "field": "name"
+            })
+        }
+
         event.sub_events.push({
             name: name
         })

@@ -1,5 +1,6 @@
 
 const mongoose = require("mongoose")
+const _ = require("lodash")
 const sessionToken = require("./extras/session-token.js")
 const departments = require("./extras/departments.js")
 const users = require("./extras/users.js")
@@ -15,6 +16,12 @@ const hodSchema = mongoose.Schema({
         required: true,
         trim: true,
         lowercase: true
+    },
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+        lowercase: true,
     },
     password: {
         type: String,
@@ -44,6 +51,7 @@ function toObject(obj, include_session_token) {
         id: obj.id,
         type: obj.type,
         email: obj.email,
+        name: _.startCase(obj.name),
         department: obj.department,
         session_token: include_session_token ? obj.session_token.token : undefined 
     }

@@ -1,19 +1,21 @@
 const authMiddleware = require("../middlewares/auth.js")
 const departments = require("../schemas/extras/departments.js")
+const participantObj = require("../schemas/extras/participant.js")
 const users = require("../schemas/extras/users.js")
 const userObj = require("../schemas/user.js")
 const eventObj = require("../schemas/event.js")
 const utils = require("../utils/utils.js")
+const _ = require("lodash")
 const { v4: uuidv4 } = require('uuid')
 const { default: mongoose } = require("mongoose")
 
 function initialize(app, UserModel, EventModel) {
 
-    createEventEndpoint(app, UserModel, EventModel)
+    createParticipantEndpoint(app, UserModel, EventModel)
 
 }
 
-function createEventEndpoint(app, UserModel, EventModel) {
+function createParticipantEndpoint(app, UserModel, EventModel) {
 
     app.post("/api/participant/add", authMiddleware.restrictAccess(app, UserModel, ["admin"]))
     app.post("/api/participant/add", async (req, res) => {
@@ -32,22 +34,14 @@ function createEventEndpoint(app, UserModel, EventModel) {
 
         // event_id validation
 
-        if (!utils.checkType(name, String)) {
+        if (!utils.checkType(event_id, String)) {
             return res.status(400).send({
-                "err_msg": "name must be a string",
-                "field": "name"
-            })
-        }
-
-        let event;
-        try {
-            event = await EventModel.findOne({ _id: event_id })
-        } catch(err) {
-            return res.status(400).send({
-                "err_msg": "event_id is invalid",
+                "err_msg": "event_id must be a string",
                 "field": "event_id"
             })
         }
+
+        const event = await eventObj.getEventById(event_id, EventModel)
         if (!event) {
             return res.status(400).send({
                 "err_msg": "event_id is invalid",
@@ -55,24 +49,16 @@ function createEventEndpoint(app, UserModel, EventModel) {
             })
         }
 
-        // event_id validation
+        // sub_event_id validation
 
-        if (!utils.checkType(name, String)) {
+        if (!utils.checkType(sub_event_id, String)) {
             return res.status(400).send({
-                "err_msg": "name must be a string",
-                "field": "name"
-            })
-        }
-
-        let sub_event;
-        try {
-            sub_event = await EventModel.findOne({ "_id": event_id, "sub_events._id": sub_event_id })
-        } catch(err) {
-            return res.status(400).send({
-                "err_msg": "sub_event_id is invalid",
+                "err_msg": "sub_event_id must be a string",
                 "field": "sub_event_id"
             })
         }
+
+        const sub_event = eventObj.getSubEventById(sub_event_id, event)
         if (!sub_event) {
             return res.status(400).send({
                 "err_msg": "sub_event_id is invalid",
@@ -113,9 +99,9 @@ function createEventEndpoint(app, UserModel, EventModel) {
             })
         }
 
-        let result = await EventModel.findOne({"sub_events.participants.email": email.trim().toLowerCase()})
+        let result = participantObj.getParticipantWithEmail(email, sub_event)
         if (result) return res.status(400).send({
-            "err_msg": "An user with the same email exist",
+            "err_msg": "A user with the same email exist",
             "field": "email"
         })
 
@@ -147,31 +133,27 @@ function createEventEndpoint(app, UserModel, EventModel) {
 
         const participant_id = new mongoose.Types.ObjectId();
 
-        for (let subEventObj of event.sub_events) {
-            if (subEventObj._id.toString() === sub_event_id) {
-                subEventObj.participants.push({
-                    _id: participant_id,
-                    name: name,
-                    email: email,
-                    contact_no: contact_no,
-                    college: college
-                })
-            }
-        }
-
-        await event.save()
-
-        res.send({
+        sub_event.participants.push({
             _id: participant_id,
             name: name,
             email: email,
             contact_no: contact_no,
             college: college
+        })
+
+        await event.save()
+
+        res.send({
+            _id: participant_id,
+            name: _.startCase(name.toLowerCase()),
+            email: email.trim(),
+            contact_no: contact_no.trim(),
+            college: _.startCase(college.toLowerCase())
         });
 
     })
 
-    // app.post("/api/participant/get", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator", "volunteer"]))
+    app.post("/api/participant/get", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator", "volunteer"]))
     app.post("/api/participant/get", async (req, res) => {
 
         const { event_id, sub_event_id, participant_id } = req.body;
@@ -195,11 +177,27 @@ function createEventEndpoint(app, UserModel, EventModel) {
             })
         }
 
+        const event = await eventObj.getEventById(event_id, EventModel)
+        if (!event) {
+            return res.status(400).send({
+                "err_msg": "event_id is invalid",
+                "field": "event_id"
+            })
+        }
+
         // sub_event_id validation
 
         if (!utils.checkType(sub_event_id, String)) {
             return res.status(400).send({
                 "err_msg": "sub_event_id must be a string",
+                "field": "sub_event_id"
+            })
+        }
+
+        const sub_event = eventObj.getSubEventById(sub_event_id, event)
+        if (!sub_event) {
+            return res.status(400).send({
+                "err_msg": "sub_event_id is invalid",
                 "field": "sub_event_id"
             })
         }
@@ -213,44 +211,28 @@ function createEventEndpoint(app, UserModel, EventModel) {
             })
         }
 
-        let event;
-        try {
-            event = await EventModel.findOne({ _id: event_id, "sub_events._id": sub_event_id, "sub_events.participants._id" : participant_id })
-        } catch(err) {
-            return res.status(400).send({
-                "err_msg": "participant_id is invalid",
-                "field": "participant_id"
-            })
-        }
-        if (!event) {
+        let participant = participantObj.getParticipantById(participant_id, sub_event)
+        if (!participant) {
             return res.status(400).send({
                 "err_msg": "participant_id is invalid",
                 "field": "participant_id"
             })
         }
 
-        let participantObj_;
+        let returnObj;
 
-        for (let subEventObj of event.sub_events) {
-            if (subEventObj._id.toString() === sub_event_id) {
-                for (let participantObj of subEventObj.participants) {
-                    if (participantObj._id.toString() === participant_id) {
-                        participantObj_ = {
-                            name: participantObj.name,
-                            email: participantObj.email,
-                            contact_no: participantObj.contact_no,
-                            college: participantObj.college,
-                            event_details: {
-                                event_name: event.name,
-                                sub_event_name: subEventObj.name
-                            }
-                        }
-                    }
-                }
+        returnObj = {
+            ...participantObj.toObject(participant, force_is_verifed=true),
+            first_verification: participant.is_verified === false ? true : false,
+            event_details: {
+                event_name: _.startCase(event.name),
+                sub_event_name: _.startCase(sub_event.name)
             }
         }
+        participant.is_verified = true
+        await event.save()
 
-        res.send(participantObj_)
+        res.send(returnObj)
 
     })
 

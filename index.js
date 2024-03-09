@@ -12,13 +12,14 @@ const userObj = require(`${__dirname}/schemas/user.js`)
 const authEndpoint = require(`${__dirname}/endpoints/auth.js`)
 const eventEndpoint = require(`${__dirname}/endpoints/event.js`)
 const pariticipantEndpoint = require(`${__dirname}/endpoints/participant.js`)
+const requestEndpoint = require(`${__dirname}/endpoints/request.js`)
 
 // Initializing Database
 if (process.env.PORT) {
     mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.dhwbvao.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
 } else {
-    mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.dhwbvao.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
-    // mongoose.connect(`mongodb://127.0.0.1:27017/EventManagement`)
+    // mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.dhwbvao.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
+    mongoose.connect(`mongodb://127.0.0.1:27017/EventManagement`)
 }
 
 // Initializing Express App
@@ -36,6 +37,7 @@ const UserModel = userObj.initialize()
 authEndpoint.initialize(app, UserModel)
 eventEndpoint.initialize(app, UserModel, EventModel)
 pariticipantEndpoint.initialize(app, UserModel, EventModel)
+requestEndpoint.initialize(app, UserModel, EventModel, RequestModel)
 
 // Starting Server
 app.listen(process.env.PORT || 3000, () => {
