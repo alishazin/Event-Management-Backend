@@ -185,6 +185,13 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
             })
         }
 
+        if (!(event.student_coordinator.toString() === res.locals.user._id.toString() || eventObj.checkIfUserPartOfEvent(res.locals.user._id.toString(), event))) {
+            return res.status(400).send({
+                "err_msg": "only studentcoordinator and volunteers of this event can access this endpoint",
+                "field": "event_id"
+            })
+        }
+
         // sub_event_id validation
 
         if (!utils.checkType(sub_event_id, String)) {

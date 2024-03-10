@@ -1,0 +1,624 @@
+{
+	"info": {
+		"_postman_id": "13a72305-dadc-46c7-b0a0-222a3cb8f69b",
+		"name": "Event Management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21096505"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "admin-access-code",
+								"value": "044453c2-e45a-4c5d-91b5-c3c14a483d61",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"studentcoordinator\", // one of [studentcoordinator, volunteer, hod]\r\n    \"email\": \"arbitary@gmail.com\",\r\n    \"name\": \"arbitary\",\r\n    \"password\": \"12345678\",\r\n    \"department\": \"cse\" // only required for type: hod\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/create-user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"create-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Log In",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"arbitary@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}\r\n\r\n// all users can access this endpoint",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/log-in",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"log-in"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Session",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "admin-access-code",
+								"value": "044453c2-e45a-4c5d-91b5-c3c14a483d61",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"session_token\": \"6ddc15cf-78d6-427d-9bc6-0e545a5eea03\"\r\n}\r\n\r\n// events_as_studentcoordinator, events_as_treasurer, events_as_eventmanager and events_as_volunteer contains ID of events which this user is part of",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/verify-session",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"verify-session"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "44f284d5-66e1-4ee0-b006-667042d16269",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"old_password\": \"1234567890\",\r\n    \"new_password\": \"12345678\"\r\n}\r\n\r\n// all users can access this endpoint",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/change-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Event",
+			"item": [
+				{
+					"name": "Create Event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "388b14cb-bcb4-4140-afb7-cf6bcada2fc4",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Min Blogging Shit\",\r\n    \"date_from\": \"2024-03-11\",\r\n    \"date_to\": \"2024-03-13\", // exclude this field if the event is for a day\r\n    \"department\": \"cse\"\r\n}\r\n\r\n// only studentcoordinator accounts can access this endpoint",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/event/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"event",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Sub Event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "388b14cb-bcb4-4140-afb7-cf6bcada2fc4",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"event_id\": \"65edb061a5ddd67dad20d302\",\r\n    \"name\": \"Mind Hunter\"\r\n}\r\n\r\n// only studentcoordinator of the evenet can access this endpoint",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/sub-event/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"sub-event",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Events",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "db336d7c-8c3b-4d57-ab26-49b6f80b3614",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/event/get-all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"event",
+								"get-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Event By ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "6ddc15cf-78d6-427d-9bc6-0e545a5eea03",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "admin-access-code",
+								"value": "044453c2-e45a-4c5d-91b5-c3c14a483d61",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/event/get-one?id=65ec9f39159293c770fb0bfd",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"event",
+								"get-one"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "65ec9f39159293c770fb0bfd"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Participants",
+			"item": [
+				{
+					"name": "Add Participant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "admin-access-code",
+								"value": "044453c2-e45a-4c5d-91b5-c3c14a483d61",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"name\": \"Victor\",\r\n    \"email\": \"ssawewa@gmail.com\",\r\n    \"contact_no\": \"9876543212\",\r\n    \"college\": \"BSA Crescent\"\r\n}\r\n\r\n// only admin can access this endpoint",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/participant/add",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"participant",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Participant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "40b8d584-757f-406c-8ce9-57ba9f5d00ba",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"participant_id\": \"65ecb6161648f4c2c4c734d9\"\r\n}\r\n\r\n// anyone who is part of this event can access this endpoint \r\n// cant be access by hod or admin",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/participant/get",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"participant",
+								"get"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Request",
+			"item": [
+				{
+					"name": "Create Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "6ddc15cf-78d6-427d-9bc6-0e545a5eea03",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"to_event\": \"65edb061a5ddd67dad20d302\",\r\n    \"position\": \"eventmanager\", // one of ['treasurer', 'eventmanager', 'volunteer']\r\n    \"to_sub_event\": \"65edb098a5ddd67dad20d311\" // required if position: eventmanager\r\n}\r\n\r\n// can be accessed by any volunteer accounts",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/request/create-request",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"request",
+								"create-request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Request By User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "6ddc15cf-78d6-427d-9bc6-0e545a5eea03",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/request/get-all",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"request",
+								"get-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Request By User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "88f6c634-584d-41d4-856a-f3c55b9e936a",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"request_id\": \"65ecc8c8aa7395ad2977d6c7\"\r\n}\r\n\r\n// volunteers can delete their request before studentcoordinator accept or reject it",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/request/delete-request",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"request",
+								"delete-request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Request For Event",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "40b8d584-757f-406c-8ce9-57ba9f5d00ba",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/request/get-all-event",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"request",
+								"get-all-event"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "388b14cb-bcb4-4140-afb7-cf6bcada2fc4",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"request_id\": \"65edb0cfa5ddd67dad20d318\"\r\n}\r\n\r\n// can be access by studentcoordinator of event which request belongs to",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/request/accept-request",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"request",
+								"accept-request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "db336d7c-8c3b-4d57-ab26-49b6f80b3614",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"request_id\": \"65ed93879a99e2b1aba7ba40\"\r\n}\r\n\r\n// can be access by studentcoordinator of event which request belongs to",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/request/reject-request",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"request",
+								"reject-request"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
