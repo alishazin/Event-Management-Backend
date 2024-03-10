@@ -20,6 +20,20 @@ const requestSchema = mongoose.Schema({
     position: {
         type: String,
         enum: ['treasurer', 'eventmanager', 'volunteer']
+    },
+    status: {
+        type: String,
+        enum: ['accepted', 'rejected', 'waiting'],
+        default: 'waiting'
+    },
+    request_made_date: {
+        type: Date,
+        required: true,
+        default: new Date()
+    },
+    request_response_date: {
+        type: Date,
+        required: false
     }
 })
 
@@ -58,9 +72,33 @@ async function toObject(
             _id: to_sub_event_obj._id.toString(), 
             name: _.startCase(to_sub_event_obj.name)
         } : null,
-        position: requestObj.position
+        position: requestObj.position,
+        status: requestObj.status,
+        request_made_date: requestObj.request_made_date,
+        request_response_date: requestObj.status !== "waiting" ? requestObj.request_response_date : null
     }
 
 }
 
-module.exports = {initialize: initialize, toObject: toObject}
+async function getRequestById(id, RequestModel, status = null) {
+    let event;
+    try {
+        if (status) {
+            event = await RequestModel.findOne({ _id: id, status: status })
+        } else {
+            event = await RequestModel.findOne({ _id: id })
+        }
+    } catch(err) {
+        return null
+    }
+    if (!event) {
+        return null
+    }
+    return event
+}
+
+module.exports = {
+    initialize: initialize, 
+    toObject: toObject,
+    getRequestById: getRequestById
+}

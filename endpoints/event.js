@@ -151,15 +151,7 @@ function createSubEventEndpoint(app, UserModel, EventModel) {
             })
         }
 
-        let event;
-        try {
-            event = await EventModel.findOne({ _id: event_id })
-        } catch(err) {
-            return res.status(400).send({
-                "err_msg": "event_id is invalid",
-                "field": "event_id"
-            })
-        }
+        const event = await eventObj.getEventById(event_id, EventModel);
         if (!event) {
             return res.status(400).send({
                 "err_msg": "event_id is invalid",

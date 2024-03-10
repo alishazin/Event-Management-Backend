@@ -89,7 +89,7 @@ function subEventToObject(obj) {
 
 async function toObject(obj, UserModel) {
     return {
-        id: obj.id,
+        _id: obj.id,
         name: _.startCase(obj.name),
         date_from: obj.date_from,
         date_to: obj.date_to ? obj.date_to : null,
