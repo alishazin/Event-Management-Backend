@@ -134,10 +134,47 @@ function getSubEventById(sub_event_id, eventObj) {
         return null
 }
 
+function checkIfVolunteerExistById(volunteer_id, eventObj) {
+    let found = false;
+
+    for (let volunteerId of eventObj.volunteers) {
+        if (volunteerId.toString() === volunteer_id) {
+            found = true
+            break
+        }
+    }
+
+    return found
+}
+
+function checkIfEventManagerExistById(event_manager_id, eventObj) {
+    let found = false;
+
+    for (let subEvent of eventObj.sub_events) {
+        if (subEvent.event_manager && subEvent.event_manager.toString() === event_manager_id) {
+            found = true
+            break
+        }
+    }
+
+    return found
+}
+
+function checkIfUserPartOfEvent(user_id, eventObj) {
+    return (
+        checkIfEventManagerExistById(user_id, eventObj) ||
+        checkIfVolunteerExistById(user_id, eventObj) ||
+        (eventObj.treasurer ? eventObj.treasurer.toString() === user_id : 0)
+    )
+}
+
 module.exports = {
     initialize: initialize, 
     toObject: toObject, 
     checkIfSubEventExist: checkIfSubEventExist, 
     getEventById: getEventById, 
-    getSubEventById: getSubEventById
+    getSubEventById: getSubEventById,
+    checkIfVolunteerExistById: checkIfVolunteerExistById,
+    checkIfEventManagerExistById: checkIfEventManagerExistById,
+    checkIfUserPartOfEvent: checkIfUserPartOfEvent
 }
