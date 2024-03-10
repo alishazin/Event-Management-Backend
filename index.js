@@ -34,7 +34,7 @@ const RequestModel = requestObj.initialize()
 const UserModel = userObj.initialize()
 
 // Initialize Endpoints
-authEndpoint.initialize(app, UserModel)
+authEndpoint.initialize(app, UserModel, EventModel)
 eventEndpoint.initialize(app, UserModel, EventModel)
 pariticipantEndpoint.initialize(app, UserModel, EventModel)
 requestEndpoint.initialize(app, UserModel, EventModel, RequestModel)

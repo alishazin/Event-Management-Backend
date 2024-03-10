@@ -6,12 +6,13 @@ const users = require("../schemas/extras/users.js")
 const userObj = require("../schemas/user.js")
 const utils = require("../utils/utils.js")
 const { v4: uuidv4 } = require('uuid')
+const event = require("./event.js")
 
-function initialize(app, UserModel) {
+function initialize(app, UserModel, EventModel) {
 
     createUserEndpoint(app, UserModel)
     logInEndpoint(app, UserModel)
-    verifySessionTokenEndpoint(app, UserModel)
+    verifySessionTokenEndpoint(app, UserModel, EventModel)
     changePasswordEndpoint(app, UserModel)
 
 }
@@ -208,7 +209,7 @@ function logInEndpoint(app, UserModel) {
 
 }
 
-function verifySessionTokenEndpoint(app, UserModel) {
+function verifySessionTokenEndpoint(app, UserModel, EventModel) {
 
     app.post("/api/auth/verify-session", async (req, res) => {
 
@@ -248,9 +249,55 @@ function verifySessionTokenEndpoint(app, UserModel) {
             })
         }
 
-        return res.status(200).send(
-            userObj.toObject(user)
-        )
+        const all_events = await EventModel.find()
+        const events_as_studentcoordinator = []
+        const events_as_treasurer = []
+        const events_as_eventmanager = []
+        const events_as_volunteer = []
+
+        if (user.type === "studentcoordinator") {
+
+            for (let event of all_events) {
+                if (event.student_coordinator?.toString() === user._id.toString()) {
+                    events_as_studentcoordinator.push(event._id.toString())
+                }
+            }     
+
+        }
+
+        if (user.type === "volunteer") {
+
+            for (let event of all_events) {
+                if (event.treasurer?.toString() === user._id.toString()) {
+                    events_as_treasurer.push(event._id.toString())
+                }
+            }  
+
+            for (let event of all_events) {
+                for (let sub_event of event.sub_events) {
+                    if (sub_event.event_manager?.toString() === user._id.toString()) {
+                        events_as_eventmanager.push(event._id.toString())
+                    }
+                }
+            }     
+
+            for (let event of all_events) {
+                for (let volunteer of event.volunteers) {
+                    if (volunteer.toString() === user._id.toString()) {
+                        events_as_volunteer.push(event._id.toString())
+                    }
+                }
+            }     
+
+        }
+
+        return res.status(200).send({
+            ...userObj.toObject(user),
+            events_as_studentcoordinator : events_as_studentcoordinator,
+            events_as_treasurer : events_as_treasurer,
+            events_as_eventmanager : events_as_eventmanager,
+            events_as_volunteer : events_as_volunteer
+        })
 
     })
 
