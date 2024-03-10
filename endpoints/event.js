@@ -6,11 +6,13 @@ const userObj = require("../schemas/user.js")
 const eventObj = require("../schemas/event.js")
 const utils = require("../utils/utils.js")
 const { v4: uuidv4 } = require('uuid')
+const _ = require('lodash')
 
 function initialize(app, UserModel, EventModel) {
 
     createEventEndpoint(app, UserModel, EventModel)
     createSubEventEndpoint(app, UserModel, EventModel)
+    getEventEndpoint(app, UserModel, EventModel)
 
 }
 
@@ -193,6 +195,116 @@ function createSubEventEndpoint(app, UserModel, EventModel) {
         res.send(await eventObj.toObject(event, UserModel))
 
     })
+
+}
+
+function getEventEndpoint(app, UserModel, EventModel) {
+
+    app.get("/api/event/get-all", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer"]))
+    app.get("/api/event/get-all", async (req, res) => {
+
+        const resData = []
+        const result = await EventModel.find()
+
+        for (let event of result) {
+
+            resData.push(await eventObj.toObject(event, UserModel, {
+                include_student_coordinator: false,
+                include_sub_events: true,
+                include_treasurer: false,
+                include_volunteers: false,
+                include_sub_event_event_manager: false,
+                include_sub_event_participants: false,
+                include_sub_event_bills: false,
+            }))
+
+        }
+
+        res.status(200).send(resData)
+
+    })
+
+    app.get("/api/event/get-one", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer"]))
+    app.get("/api/event/get-one", async (req, res) => {
+
+        const { id } = req.query
+
+        const event = await eventObj.getEventById(id, EventModel)
+        if (!event) {
+            return res.status(400).send({
+                "err_msg": "id is invalid",
+                "field": "id"
+            })
+        }
+
+        if (
+            res.locals.userType === "admin" ||
+            (res.locals.userType === "hod" && event.department === res.locals.user.department) ||
+            (res.locals.userType === "studentcoordinator" && event.student_coordinator?.toString() === res.locals.user._id.toString()) ||
+            (res.locals.userType === "volunteer" && event.treasurer?.toString() === res.locals.user._id.toString())
+        ) {
+            return res.status(200).send(await eventObj.toObject(event, UserModel))
+        }
+
+        // checks if an event_manager
+
+        if (eventObj.checkIfEventManagerExistById(res.locals.user._id.toString(), event)) {
+            
+            const result = await eventObj.toObject(event, UserModel, {
+                include_student_coordinator: false,
+                include_sub_events: true,
+                include_treasurer: false,
+                include_volunteers: false,
+                include_sub_event_event_manager: false,
+                include_sub_event_participants: true,
+                include_sub_event_bills: false,
+            })
+
+            result.sub_events = await Promise.all(result.sub_events.map(async (sub_event_obj) => {
+
+                const sub_event_obj_full = eventObj.getSubEventById(sub_event_obj._id.toString(), event)
+
+                if (sub_event_obj_full.event_manager?.toString() === res.locals.user._id.toString()) {
+                    return await eventObj.subEventToObject(sub_event_obj_full, UserModel, {
+                        include_event_manager: true,
+                        include_participants: true,
+                        include_bills: true,
+                    })
+                } else {
+                    return sub_event_obj
+                }
+
+            }))
+
+            return res.status(200).send(result)
+
+        }
+
+        if (eventObj.checkIfVolunteerExistById(res.locals.user._id.toString(), event)) {
+            return res.status(200).send(await eventObj.toObject(event, UserModel, {
+                include_student_coordinator: false,
+                include_sub_events: true,
+                include_treasurer: false,
+                include_volunteers: false,
+                include_sub_event_event_manager: false,
+                include_sub_event_participants: true,
+                include_sub_event_bills: false,
+            }))
+        }
+
+        // for people not linked to the event at all
+        return res.status(200).send(await eventObj.toObject(event, UserModel, {
+            include_student_coordinator: false,
+            include_sub_events: true,
+            include_treasurer: false,
+            include_volunteers: false,
+            include_sub_event_event_manager: false,
+            include_sub_event_participants: false,
+            include_sub_event_bills: false,
+        }))
+
+    })
+
 
 }
 

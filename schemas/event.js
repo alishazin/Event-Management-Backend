@@ -17,7 +17,7 @@ function initialize() {
         },
         event_manager: {
             type: mongoose.Types.ObjectId,
-            required: false // will be invited later
+            required: false
         },
         participants: [participantObj.schema],
         bills: [billSchema],
@@ -76,30 +76,55 @@ function checkIfSubEventExist(eventObj, subEventName) {
 
 }
 
-function subEventToObject(obj) {
-    console.log(obj);
+async function subEventToObject(obj, UserModel, {
+    include_event_manager = true,
+    include_participants = true,
+    include_bills = true,
+}) {
     return {
-        id: obj._id,
+        _id: obj._id,
         name: _.startCase(obj.name),
-        event_manager: obj.event_manager ? obj.event_manager : null,
-        participants: obj.participants,
-        bills: obj.bills,
+        event_manager: include_event_manager ? 
+            (obj.event_manager ? userObj.toObject(await userObj.getById(obj.event_manager, UserModel)) : undefined)
+            : undefined,
+        participants: include_participants ? obj.participants : undefined,
+        bills: include_bills ? obj.bills : undefined,
     }
 }
 
-async function toObject(obj, UserModel) {
+async function toObject(
+    obj, UserModel, {
+        include_student_coordinator = true,
+        include_treasurer = true,
+        include_volunteers = true,
+        include_sub_events = true,
+        include_sub_event_event_manager = true,
+        include_sub_event_participants = true,
+        include_sub_event_bills = true,
+    } = {}
+) {
     return {
         _id: obj.id,
         name: _.startCase(obj.name),
         date_from: obj.date_from,
         date_to: obj.date_to ? obj.date_to : null,
         department: obj.department,
-        student_coordinator: obj.student_coordinator ? userObj.toObject(await userObj.getById(obj.student_coordinator, UserModel)) : null,
-        treasurer: obj.treasurer ? userObj.toObject(await userObj.getById(obj.treasurer, UserModel)) : null,
-        volunteers: obj.volunteers ? userObj.toObject(await userObj.getById(obj.volunteers, UserModel)) : null,
-        sub_events: obj.sub_events.map((sub_event) => {
-            return subEventToObject(sub_event)
-        }),
+        student_coordinator: include_student_coordinator ? 
+            (obj.student_coordinator ? userObj.toObject(await userObj.getById(obj.student_coordinator, UserModel)) : null)
+            : undefined,
+        treasurer: include_treasurer ?
+            (obj.treasurer ? userObj.toObject(await userObj.getById(obj.treasurer, UserModel)) : null)
+            : undefined,
+        volunteers: include_volunteers ? await Promise.all(obj.volunteers.map(async (volunteer) => {
+            return userObj.toObject(await userObj.getById(volunteer, UserModel), false)
+        })) : undefined,
+        sub_events: include_sub_events ? await Promise.all(obj.sub_events.map(async (sub_event) => {
+            return await subEventToObject(sub_event, UserModel, {
+                include_event_manager: include_sub_event_event_manager,
+                include_participants: include_sub_event_participants,
+                include_bills: include_sub_event_bills
+            })
+        })) : undefined,
     }
 }
 
@@ -176,5 +201,6 @@ module.exports = {
     getSubEventById: getSubEventById,
     checkIfVolunteerExistById: checkIfVolunteerExistById,
     checkIfEventManagerExistById: checkIfEventManagerExistById,
-    checkIfUserPartOfEvent: checkIfUserPartOfEvent
+    checkIfUserPartOfEvent: checkIfUserPartOfEvent,
+    subEventToObject: subEventToObject
 }

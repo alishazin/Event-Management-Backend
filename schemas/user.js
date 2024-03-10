@@ -48,7 +48,7 @@ function initialize() {
 
 function toObject(obj, include_session_token) {
     return {
-        _id: obj.id,
+        _id: obj._id,
         type: obj.type,
         email: obj.email,
         name: _.startCase(obj.name),
