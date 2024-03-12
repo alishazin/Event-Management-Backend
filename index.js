@@ -13,6 +13,7 @@ const authEndpoint = require(`${__dirname}/endpoints/auth.js`)
 const eventEndpoint = require(`${__dirname}/endpoints/event.js`)
 const pariticipantEndpoint = require(`${__dirname}/endpoints/participant.js`)
 const requestEndpoint = require(`${__dirname}/endpoints/request.js`)
+const invitationEndpoint = require(`${__dirname}/endpoints/invitation.js`)
 
 // Initializing Database
 if (process.env.PORT) {
@@ -38,6 +39,7 @@ authEndpoint.initialize(app, UserModel, EventModel)
 eventEndpoint.initialize(app, UserModel, EventModel)
 pariticipantEndpoint.initialize(app, UserModel, EventModel)
 requestEndpoint.initialize(app, UserModel, EventModel, RequestModel)
+invitationEndpoint.initialize(app, UserModel, EventModel, InvitationModel)
 
 // Starting Server
 app.listen(process.env.PORT || 3000, () => {

@@ -6,8 +6,7 @@ const userObj = require("../schemas/user.js")
 const eventObj = require("../schemas/event.js")
 const requestObj = require("../schemas/request.js")
 const utils = require("../utils/utils.js")
-const { v4: uuidv4 } = require('uuid')
-const { default: mongoose } = require("mongoose")
+const mongoose = require("mongoose")
 
 function initialize(app, UserModel, EventModel, RequestModel) {
 
@@ -81,7 +80,7 @@ function initialize(app, UserModel, EventModel, RequestModel) {
 
             if (sub_event.event_manager) {
                 return res.status(400).send({
-                    "err_msg": "sub event already has a eventmanager",
+                    "err_msg": "sub event already has an eventmanager",
                     "field": "to_sub_event"
                 })
             }

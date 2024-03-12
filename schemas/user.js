@@ -61,4 +61,23 @@ async function getById(idObj, UserModel) {
     return await UserModel.findOne({_id: idObj})
 }
 
-module.exports = {initialize: initialize, schema: hodSchema, toObject: toObject, getById: getById}
+async function getUserById(id, UserModel) {
+    let userObj;
+    try {
+        userObj = await UserModel.findOne({ _id: id })
+    } catch(err) {
+        return null
+    }
+    if (!userObj) {
+        return null
+    }
+    return userObj
+}
+
+module.exports = {
+    initialize: initialize, 
+    schema: hodSchema, 
+    toObject: toObject, 
+    getById: getById,
+    getUserById: getUserById
+}
