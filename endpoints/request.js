@@ -152,7 +152,7 @@ function initialize(app, UserModel, EventModel, RequestModel) {
     app.delete("/api/request/delete-request", authMiddleware.restrictAccess(app, UserModel, ["volunteer"]))
     app.delete("/api/request/delete-request", async (req, res) => {
 
-        const { request_id } = req.body
+        const { request_id } = req.query
 
         if (!mongoose.isValidObjectId(request_id)) {
             return res.status(400).send({

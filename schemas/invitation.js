@@ -58,7 +58,7 @@ async function toObject(
         from_event_obj = await eventObj.getEventById(invitationObj.from_event, EventModel)
     }
 
-    if (invitationObj.to_sub_event && from_sub_event_obj === null) {
+    if (invitationObj.from_sub_event && from_sub_event_obj === null) {
         from_sub_event_obj = eventObj.getSubEventById(invitationObj.from_sub_event.toString(), from_event_obj)
     }
 
@@ -76,7 +76,7 @@ async function toObject(
         position: invitationObj.position,
         status: invitationObj.status,
         invitation_made_date: invitationObj.invitation_made_date,
-        invitation_response_date: invitationObj.status !== "waiting" ? requestObj.invitation_response_date : null
+        invitation_response_date: invitationObj.status !== "waiting" ? invitationObj.invitation_response_date : null
     }
 
 }

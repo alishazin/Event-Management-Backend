@@ -152,6 +152,184 @@ function initialize(app, UserModel, EventModel, InvitationModel) {
 
     })
 
+    app.get("/api/invitation/get-all", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator"]))
+    app.get("/api/invitation/get-all", async (req, res) => {
+
+        const { event_id } = req.query
+
+        // event_id validation
+
+        if (event_id === null || event_id === undefined) {
+            return res.status(400).send({
+                "err_msg": "event_id is a required query parameter",
+                "field": "event_id"
+            })
+        }
+
+        if (!utils.checkType(event_id, String)) {
+            return res.status(400).send({
+                "err_msg": "event_id must be a string",
+                "field": "event_id"
+            })
+        }
+        
+        const event = await eventObj.getEventById(event_id, EventModel)
+        if (!event) {
+            return res.status(400).send({
+                "err_msg": "invalid event_id",
+                "field": "event_id"
+            })
+        }
+        
+        if (event.student_coordinator.toString() !== res.locals.user._id.toString()) {
+            return res.status(400).send({
+                "err_msg": "only studentcoordinator of the vent can view the invitations",
+                "field": "event_id"
+            })
+        }
+
+        const returnData = []
+
+        const result = await InvitationModel.find({from_event: event._id})
+        
+        for (let invitation of result) {
+            returnData.push(await invitationObj.toObject(invitation, UserModel, EventModel, null, event, null))
+        }
+
+        return res.status(200).send(returnData)
+
+    })
+
+    app.delete("/api/invitation/delete-invitation", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator"]))
+    app.delete("/api/invitation/delete-invitation", async (req, res) => {
+
+        const { invitation_id } = req.body
+
+        if (!mongoose.isValidObjectId(invitation_id)) {
+            return res.status(400).send({
+                "err_msg": "invalid invitation_id",
+                "field": "invitation_id"
+            })
+        }
+
+        const invitationObj = await InvitationModel.findOne({ _id: invitation_id, status: "waiting" })
+        if (!invitationObj) {
+            return res.status(400).send({
+                "err_msg": "A pending invitation with invitation_id does not exist",
+                "field": "invitation_id"
+            })
+        }
+
+        const event = await eventObj.getEventById(invitationObj.from_event, EventModel)
+        if (event.student_coordinator.toString() !== res.locals.user._id.toString()) {
+            return res.status(400).send({
+                "err_msg": "only studentcoordinator of the event can delete invitations",
+                "field": "invitation_id"
+            })
+        }
+
+        await InvitationModel.findByIdAndDelete(invitation_id)
+
+        res.status(200).send("Deleted Successfully")
+    })
+
+    app.get("/api/invitation/get-all-user", authMiddleware.restrictAccess(app, UserModel, ["volunteer"]))
+    app.get("/api/invitation/get-all-user", async (req, res) => {
+
+        const returnData = []
+
+        const result = await InvitationModel.find({invitation_to: res.locals.user._id})
+        
+        for (let invitation of result) {
+            returnData.push(await invitationObj.toObject(invitation, UserModel, EventModel, res.locals.user))
+        }
+
+        res.status(200).send(returnData)
+    })
+
+    app.post("/api/invitation/accept-invitation", authMiddleware.restrictAccess(app, UserModel, ["volunteer"]))
+    app.post("/api/invitation/accept-invitation", async (req, res) => {
+
+        const { invitation_id } = req.body
+
+        if (invitation_id === null || invitation_id === undefined) {
+            return res.status(400).send({
+                "err_msg": "invitation_id is required",
+                "field": "invitation_id"
+            })
+        }
+
+        const invitation = await invitationObj.getInvitationById(invitation_id, InvitationModel)
+        if (!invitation || invitation.invitation_to.toString() !== res.locals.user._id.toString()) {
+            return res.status(400).send({
+                "err_msg": "invalid invitation_id",
+                "field": "invitation_id"
+            })
+        }
+
+        if (invitation.status !== "waiting") {
+            return res.status(400).send({
+                "err_msg": "invitation status must be waiting",
+                "field": "invitation_id"
+            })
+        }
+
+        const event = await eventObj.getEventById(invitation.from_event.toString(), EventModel)
+
+        // check if user is not a part of event any way
+
+        const invitation_to_user = await UserModel.findOne({ _id: invitation.invitation_to })
+        
+        if (eventObj.checkIfUserPartOfEvent(invitation_to_user._id.toString(), event)) {
+            return res.status(400).send({
+                "err_msg": "user is already a part of the event",
+                "field": ""
+            })
+        }
+
+        // Accepting request
+        
+        let sub_event;
+
+        if (invitation.position === "eventmanager") {
+            
+            sub_event = eventObj.getSubEventById(invitation.from_sub_event.toString(), event)
+
+            if (sub_event.event_manager) {
+                return res.status(400).send({
+                    "err_msg": "sub event already has a eventmanager",
+                    "field": ""
+                })
+            }
+
+            sub_event.event_manager = invitation_to_user._id
+
+        } else if (invitation.position === "treasurer") {
+
+            if (event.treasurer) {
+                return res.status(400).send({
+                    "err_msg": "event already has a treasurer",
+                    "field": ""
+                })
+            }
+
+            event.treasurer = invitation_to_user._id
+
+        } else if (invitation.position === "volunteer") {
+
+            event.volunteers.push(invitation_to_user._id)
+
+        }
+
+        await event.save()
+        
+        invitation.status = "accepted"
+        invitation.invitation_response_date = new Date()
+        await invitation.save()
+
+        res.status(200).send(await invitationObj.toObject(invitation, UserModel, EventModel, invitation_to_user, event, sub_event))
+    })
+
 }
 
 module.exports = { initialize: initialize }
