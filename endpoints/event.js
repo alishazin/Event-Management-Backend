@@ -160,7 +160,13 @@ function createSubEventEndpoint(app, UserModel, EventModel) {
                 "field": "event_id"
             })
         }
-
+        
+        if (event.student_coordinator.toString() !== res.locals.user._id.toString()) {
+            return res.status(400).send({
+                "err_msg": "only studentcoordinator of this event can create sub-events",
+                "field": "event_id"
+            })
+        }
 
         // name validation
         
