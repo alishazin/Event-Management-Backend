@@ -2,7 +2,7 @@
 const mongoose = require("mongoose")
 const _ = require("lodash")
 const departments = require("./extras/departments.js")
-const billSchema = require("./extras/bill.js")
+const billObj = require("./extras/bill.js")
 const participantObj = require("./extras/participant.js")
 const userObj = require("./user.js")
 
@@ -20,7 +20,7 @@ function initialize() {
             required: false
         },
         participants: [participantObj.schema],
-        bills: [billSchema],
+        bills: [billObj.schema],
     })
 
     const eventSchema = mongoose.Schema({
@@ -88,7 +88,9 @@ async function subEventToObject(obj, UserModel, {
             (obj.event_manager ? userObj.toObject(await userObj.getById(obj.event_manager, UserModel)) : undefined)
             : undefined,
         participants: include_participants ? obj.participants : undefined,
-        bills: include_bills ? obj.bills : undefined,
+        bills: include_bills ? await Promise.all(obj.bills.map(async (bill) => {
+            return billObj.toObject(bill, UserModel)
+        })) : undefined,
     }
 }
 

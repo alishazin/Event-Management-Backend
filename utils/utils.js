@@ -138,7 +138,11 @@ function isUrl(string) {
 }
 
 function isBase64(string) {
-    return string.startsWith("data:image");
+    // return string.startsWith("data:image");
+    const base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+
+    return base64regex.test(string.split("base64,")[1])
+
 }
 
 module.exports = {
