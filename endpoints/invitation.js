@@ -330,6 +330,44 @@ function initialize(app, UserModel, EventModel, InvitationModel) {
         res.status(200).send(await invitationObj.toObject(invitation, UserModel, EventModel, invitation_to_user, event, sub_event))
     })
 
+    app.post("/api/invitation/reject-invitation", authMiddleware.restrictAccess(app, UserModel, ["volunteer"]))
+    app.post("/api/invitation/reject-invitation", async (req, res) => {
+
+        const { invitation_id } = req.body
+
+        const invitation = await invitationObj.getInvitationById(invitation_id, InvitationModel)
+        if (!invitation) {
+            return res.status(400).send({
+                "err_msg": "invalid invitation_id",
+                "field": "invitation_id"
+            })
+        }
+
+        if (invitation.status !== "waiting") {
+            return res.status(400).send({
+                "err_msg": "invitation status must be waiting",
+                "field": "invitation_id"
+            })
+        }
+
+        const user = await userObj.getUserById(invitation.invitation_to.toString(), UserModel)
+        
+        if (user._id.toString() !== res.locals.user._id.toString()) {
+            return res.status(400).send({
+                "err_msg": "invitation with the given id must be for you.",
+                "field": "invitation_id"
+            })
+        }
+
+        // Rejecting request
+                
+        invitation.status = "rejected"
+        invitation.invitation_response_date = new Date()
+        await invitation.save()
+
+        res.status(200).send(await invitationObj.toObject(invitation, UserModel, EventModel, user))
+    })
+
 }
 
 module.exports = { initialize: initialize }
