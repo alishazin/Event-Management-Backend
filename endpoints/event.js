@@ -122,7 +122,7 @@ function createEventEndpoint(app, UserModel, EventModel) {
 
         await event.save()
 
-        res.status(200).send(await eventObj.toObject(event, UserModel))
+        res.status(200).send(await eventObj.toObject(event, UserModel, res.locals.user._id.toString()))
 
     })
 }
@@ -198,7 +198,7 @@ function createSubEventEndpoint(app, UserModel, EventModel) {
 
         await event.save()
 
-        res.send(await eventObj.toObject(event, UserModel))
+        res.send(await eventObj.toObject(event, UserModel, res.locals.user._id.toString()))
 
     })
 
@@ -214,7 +214,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
 
         for (let event of result) {
 
-            resData.push(await eventObj.toObject(event, UserModel, {
+            resData.push(await eventObj.toObject(event, UserModel, res.locals.user?._id.toString(), {
                 include_student_coordinator: false,
                 include_sub_events: true,
                 include_treasurer: false,
@@ -222,6 +222,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
                 include_sub_event_event_manager: false,
                 include_sub_event_participants: false,
                 include_sub_event_bills: false,
+                include_sub_event_your_bills: false
             }))
 
         }
@@ -249,14 +250,14 @@ function getEventEndpoint(app, UserModel, EventModel) {
             (res.locals.userType === "studentcoordinator" && event.student_coordinator?.toString() === res.locals.user._id.toString()) ||
             (res.locals.userType === "volunteer" && event.treasurer?.toString() === res.locals.user._id.toString())
         ) {
-            return res.status(200).send(await eventObj.toObject(event, UserModel))
+            return res.status(200).send(await eventObj.toObject(event, UserModel, res.locals.user?._id.toString()))
         }
 
         // checks if an event_manager
 
         if (eventObj.checkIfEventManagerExistById(res.locals.user._id.toString(), event)) {
             
-            const result = await eventObj.toObject(event, UserModel, {
+            const result = await eventObj.toObject(event, UserModel, res.locals.user._id.toString(), {
                 include_student_coordinator: false,
                 include_sub_events: true,
                 include_treasurer: false,
@@ -264,6 +265,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
                 include_sub_event_event_manager: false,
                 include_sub_event_participants: true,
                 include_sub_event_bills: false,
+                include_sub_event_your_bills: true
             })
 
             result.sub_events = await Promise.all(result.sub_events.map(async (sub_event_obj) => {
@@ -271,10 +273,11 @@ function getEventEndpoint(app, UserModel, EventModel) {
                 const sub_event_obj_full = eventObj.getSubEventById(sub_event_obj._id.toString(), event)
 
                 if (sub_event_obj_full.event_manager?.toString() === res.locals.user._id.toString()) {
-                    return await eventObj.subEventToObject(sub_event_obj_full, UserModel, {
+                    return await eventObj.subEventToObject(sub_event_obj_full, UserModel, res.locals.user._id.toString(), {
                         include_event_manager: true,
                         include_participants: true,
                         include_bills: true,
+                        include_your_bills: true  
                     })
                 } else {
                     return sub_event_obj
@@ -287,7 +290,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
         }
 
         if (eventObj.checkIfVolunteerExistById(res.locals.user._id.toString(), event)) {
-            return res.status(200).send(await eventObj.toObject(event, UserModel, {
+            return res.status(200).send(await eventObj.toObject(event, UserModel, res.locals.user._id.toString(), {
                 include_student_coordinator: false,
                 include_sub_events: true,
                 include_treasurer: false,
@@ -295,11 +298,12 @@ function getEventEndpoint(app, UserModel, EventModel) {
                 include_sub_event_event_manager: false,
                 include_sub_event_participants: true,
                 include_sub_event_bills: false,
+                include_sub_event_your_bills: true
             }))
         }
 
         // for people not linked to the event at all
-        return res.status(200).send(await eventObj.toObject(event, UserModel, {
+        return res.status(200).send(await eventObj.toObject(event, UserModel, res.locals.user._id.toString(), {
             include_student_coordinator: false,
             include_sub_events: true,
             include_treasurer: false,
@@ -307,6 +311,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
             include_sub_event_event_manager: false,
             include_sub_event_participants: false,
             include_sub_event_bills: false,
+            include_sub_event_your_bills: false
         }))
 
     })
