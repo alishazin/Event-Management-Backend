@@ -106,6 +106,77 @@ function initialize(app, UserModel, EventModel) {
 
     })
 
+    app.delete("/api/bill/delete-bill", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator", "volunteer"]))
+    app.delete("/api/bill/delete-bill", async (req, res) => {
+
+        const { event_id, sub_event_id, bill_id } = req.body
+
+        // Required field validation
+        
+        validator = utils.validateRequired([event_id, sub_event_id, bill_id], ["event_id", "sub_event_id", "bill_id"])
+        if (!validator.is_valid) {
+            return res.status(400).send({
+                "err_msg": validator.err_msg,
+                "field": validator.err_msg.split(" ")[0]
+            })
+        }
+
+        // event_id validation
+
+        const event = await eventObj.getEventById(event_id, EventModel);
+        if (!event) {
+            return res.status(400).send({
+                "err_msg": "invalid event_id",
+                "field": "event_id"
+            })
+        }
+
+        // sub_event_id validation
+
+        const sub_event = eventObj.getSubEventById(sub_event_id, event);
+        if (!sub_event) {
+            return res.status(400).send({
+                "err_msg": "invalid sub_event_id",
+                "field": "sub_event_id"
+            })
+        }
+
+        // bill_id validation
+
+        const bill = billObj.getBillFromSubEventById(bill_id, sub_event);
+        if (!bill) {
+            return res.status(400).send({
+                "err_msg": "invalid bill_id",
+                "field": "bill_id"
+            })
+        }
+
+        if (bill.uploaded_by.toString() !== res.locals.user._id.toString()) {
+            return res.status(400).send({
+                "err_msg": "only the user who uploaded the bill can delete it",
+                "field": "bill_id"
+            })
+        }
+        
+        if (bill.status !== "waiting") {
+            return res.status(400).send({
+                "err_msg": "Can't delete bills which are not on waiting status",
+                "field": "bill_id"
+            })
+        }
+
+        await EventModel.findOneAndUpdate(
+            { _id: event_id, "sub_events._id": sub_event_id },
+            { $pull: {
+                "sub_events.$.bills" : { _id: bill_id }
+            }},
+            { safe: true, multi: false }
+        )
+
+        return res.status(200).send("sadasd")
+
+    })
+
 }
 
 module.exports = { initialize: initialize }
