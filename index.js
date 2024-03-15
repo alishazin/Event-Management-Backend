@@ -13,6 +13,9 @@ const authEndpoint = require(`${__dirname}/endpoints/auth.js`)
 const eventEndpoint = require(`${__dirname}/endpoints/event.js`)
 const pariticipantEndpoint = require(`${__dirname}/endpoints/participant.js`)
 const requestEndpoint = require(`${__dirname}/endpoints/request.js`)
+const invitationEndpoint = require(`${__dirname}/endpoints/invitation.js`)
+const userEndpoint = require(`${__dirname}/endpoints/user.js`)
+const billEndpoint = require(`${__dirname}/endpoints/bill.js`)
 
 // Initializing Database
 if (process.env.PORT) {
@@ -25,7 +28,7 @@ if (process.env.PORT) {
 // Initializing Express App
 const app = express()
 app.use(cors())
-app.use(express.json())
+app.use(express.json({limit: "50mb"}))
 
 // Initialize Collections
 const EventModel = eventObj.initialize()
@@ -38,6 +41,9 @@ authEndpoint.initialize(app, UserModel, EventModel)
 eventEndpoint.initialize(app, UserModel, EventModel)
 pariticipantEndpoint.initialize(app, UserModel, EventModel)
 requestEndpoint.initialize(app, UserModel, EventModel, RequestModel)
+invitationEndpoint.initialize(app, UserModel, EventModel, InvitationModel)
+userEndpoint.initialize(app, UserModel, EventModel)
+billEndpoint.initialize(app, UserModel, EventModel)
 
 // Starting Server
 app.listen(process.env.PORT || 3000, () => {

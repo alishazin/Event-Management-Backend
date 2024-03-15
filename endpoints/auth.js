@@ -6,7 +6,6 @@ const users = require("../schemas/extras/users.js")
 const userObj = require("../schemas/user.js")
 const utils = require("../utils/utils.js")
 const { v4: uuidv4 } = require('uuid')
-const event = require("./event.js")
 
 function initialize(app, UserModel, EventModel) {
 

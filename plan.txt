@@ -8,15 +8,15 @@ admin => can view and edit everything (devs)
 hod (each department one) => can view all events in their department, cant edit anything
 
 student coordinator => can invite volunteers, can assign event managers, 
-    can upload bills 
+    can upload bills, can scan participants
 
 volunteers (treasurer) => for the entire event, validate the bills
 
 volunteers (event managers) => can upload bills, can scan participants, can see all 
-    the bills of their sub event
+    the bills of their sub event and ones they uploaded(connected with that event)
 
 volunteers (normal) => can upload bills, can scan participants, cant view all the
-    bills, can view ones they uploaded
+    bills, can view ones they uploaded(connected with that sub-event)
 
 --> A volunteer can be invited as a treasurer, event manager or a normal volunteer
     (invitation by student coordinator)

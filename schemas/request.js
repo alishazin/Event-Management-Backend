@@ -81,20 +81,20 @@ async function toObject(
 }
 
 async function getRequestById(id, RequestModel, status = null) {
-    let event;
+    let requestObj;
     try {
         if (status) {
-            event = await RequestModel.findOne({ _id: id, status: status })
+            requestObj = await RequestModel.findOne({ _id: id, status: status })
         } else {
-            event = await RequestModel.findOne({ _id: id })
+            requestObj = await RequestModel.findOne({ _id: id })
         }
     } catch(err) {
         return null
     }
-    if (!event) {
+    if (!requestObj) {
         return null
     }
-    return event
+    return requestObj
 }
 
 module.exports = {
