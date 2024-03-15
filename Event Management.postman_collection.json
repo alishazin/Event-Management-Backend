@@ -52,7 +52,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"arbitary@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}\r\n\r\n// all users can access this endpoint",
+							"raw": "{\r\n    \"email\": \"felix@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}\r\n\r\n// all users can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -88,7 +88,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"session_token\": \"6ddc15cf-78d6-427d-9bc6-0e545a5eea03\"\r\n}\r\n\r\n// events_as_studentcoordinator, events_as_treasurer, events_as_eventmanager and events_as_volunteer contains ID of events which this user is part of",
+							"raw": "{\r\n    \"session_token\": \"88f6c634-584d-41d4-856a-f3c55b9e936a\"\r\n}\r\n\r\n// all users can access this endpoint\r\n\r\n// events_as_studentcoordinator, events_as_treasurer, events_as_eventmanager and events_as_volunteer contains ID of events which this user is part of",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -195,13 +195,13 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "388b14cb-bcb4-4140-afb7-cf6bcada2fc4",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"event_id\": \"65edb061a5ddd67dad20d302\",\r\n    \"name\": \"Mind Hunter\"\r\n}\r\n\r\n// only studentcoordinator of the evenet can access this endpoint",
+							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"name\": \"Thengakola Extra\"\r\n}\r\n\r\n// only studentcoordinator of the evenet can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -234,7 +234,7 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "db336d7c-8c3b-4d57-ab26-49b6f80b3614",
+								"value": "9e20b645-a2e0-4a91-b260-cc3edee24cc6",
 								"type": "text"
 							}
 						],
@@ -273,14 +273,14 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "6ddc15cf-78d6-427d-9bc6-0e545a5eea03",
-								"type": "text",
-								"disabled": true
+								"value": "88f6c634-584d-41d4-856a-f3c55b9e936a",
+								"type": "text"
 							},
 							{
 								"key": "admin-access-code",
 								"value": "044453c2-e45a-4c5d-91b5-c3c14a483d61",
-								"type": "text"
+								"type": "text",
+								"disabled": true
 							}
 						],
 						"body": {
@@ -356,7 +356,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Participant",
+					"name": "Verify Participant",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -403,13 +403,13 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "6ddc15cf-78d6-427d-9bc6-0e545a5eea03",
+								"value": "f2bda6aa-723e-47bf-ba1b-4f725df3dd11",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"to_event\": \"65edb061a5ddd67dad20d302\",\r\n    \"position\": \"eventmanager\", // one of ['treasurer', 'eventmanager', 'volunteer']\r\n    \"to_sub_event\": \"65edb098a5ddd67dad20d311\" // required if position: eventmanager\r\n}\r\n\r\n// can be accessed by any volunteer accounts",
+							"raw": "{\r\n    \"to_event\": \"65ec9f39159293c770fb0bfd\",\r\n    \"position\": \"treasurer\", // one of ['treasurer', 'eventmanager', 'volunteer']\r\n    \"to_sub_event\": \"65edb098a5ddd67dad20d311\" // required if position: eventmanager\r\n}\r\n\r\n// can be accessed by any volunteer accounts",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -517,13 +517,13 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "40b8d584-757f-406c-8ce9-57ba9f5d00ba",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\"\r\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -531,7 +531,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/request/get-all-event",
+							"raw": "http://localhost:3000/api/request/get-all-event?event_id=65ec9f39159293c770fb0bfd",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -541,6 +541,12 @@
 								"api",
 								"request",
 								"get-all-event"
+							],
+							"query": [
+								{
+									"key": "event_id",
+									"value": "65ec9f39159293c770fb0bfd"
+								}
 							]
 						}
 					},
@@ -553,13 +559,13 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "388b14cb-bcb4-4140-afb7-cf6bcada2fc4",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"request_id\": \"65edb0cfa5ddd67dad20d318\"\r\n}\r\n\r\n// can be access by studentcoordinator of event which request belongs to",
+							"raw": "{\r\n    \"request_id\": \"65f09289f617de1edd0a3dc7\"\r\n}\r\n\r\n// can be accessed by studentcoordinator of event which request belongs to",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -595,7 +601,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"request_id\": \"65ed93879a99e2b1aba7ba40\"\r\n}\r\n\r\n// can be access by studentcoordinator of event which request belongs to",
+							"raw": "{\r\n    \"request_id\": \"65ed93879a99e2b1aba7ba40\"\r\n}\r\n\r\n// can be accessed by studentcoordinator of event which request belongs to",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -613,6 +619,411 @@
 								"api",
 								"request",
 								"reject-request"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Invitation",
+			"item": [
+				{
+					"name": "Create Invitation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "a2728c82-52e2-4d10-b483-d2b8f454099d",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"from_event\": \"65edb061a5ddd67dad20d302\",\r\n    \"from_sub_event\": \"65eca2cd2dc0f7961ad6bcb8\",\r\n    \"to_user\": \"65f098ab4c0812433c983340\",\r\n    \"position\": \"treasurer\"\r\n}\r\n\r\n// Can be accessed by the event student_coordinator, only student_coordinator can send invitations",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/invitation/create-invitation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"invitation",
+								"create-invitation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Invitation By Event Copy",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/invitation/get-all?event_id=65ec9f39159293c770fb0bfd",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"invitation",
+								"get-all"
+							],
+							"query": [
+								{
+									"key": "event_id",
+									"value": "65ec9f39159293c770fb0bfd"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Invitation By Student Coordinator",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"invitation_id\": \"65f0937bf617de1edd0a3e5a\"\r\n}\r\n\r\n// studentcoordinator can delete their invitation before volunteer accept or reject it",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/invitation/delete-invitation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"invitation",
+								"delete-invitation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Invitation For Volunteer Users",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "34de0954-e52f-46cc-8e76-52232b893147",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/invitation/get-all-user",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"invitation",
+								"get-all-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Invitation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "061072b5-0c32-4b04-96e5-66a2f662bf30",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"invitation_id\": \"65f1911cc424ff739e6d86f9\"\r\n}\r\n\r\n// can be accessed by volunteer of which ivitation is to",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/invitation/accept-invitation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"invitation",
+								"accept-invitation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Invitation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "061072b5-0c32-4b04-96e5-66a2f662bf30",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"invitation_id\": \"65f1911cc424ff739e6d86f9\"\r\n}\r\n\r\n// can be accessed by volunteer of which ivitation is to",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/invitation/reject-invitation",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"invitation",
+								"reject-invitation"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get All Volunteers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/user/get-all-volunteers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"user",
+								"get-all-volunteers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Student Coordinators",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "12773f35-af4f-4083-8413-051d0ddb20d5",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/user/get-all-studentcoordinators",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"user",
+								"get-all-studentcoordinators"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Bill",
+			"item": [
+				{
+					"name": "Upload Bill",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "9e20b645-a2e0-4a91-b260-cc3edee24cc6",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"description\": \"Bill for aws\",\r\n    \"img\": \"adsad\"\r\n}\r\n\r\n// can be uploaded student_coordinator and volunteers(event_managers and volunteers)",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/bill/upload-bill",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"bill",
+								"upload-bill"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Waiting Bill",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "9e20b645-a2e0-4a91-b260-cc3edee24cc6",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"bill_id\": \"65f2003f39d80cf3b7b984e9\"\r\n}\r\n\r\n// can be deleted by the user who uploaded before the treasurer accepts or rejects it",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/bill/delete-bill",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"bill",
+								"delete-bill"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Respond To Bill",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "f2bda6aa-723e-47bf-ba1b-4f725df3dd11",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"bill_id\": \"65f2020a9840a3b887b0e059\",\r\n    \"status\": \"rejected\", // accepted or rejected\r\n    \"message\": \"Good one mi amigo\" // not-required\r\n}\r\n\r\n// Can be accessed by the treasurer of the event, can only respond to a bill once",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/bill/respond-to-bill",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"bill",
+								"respond-to-bill"
 							]
 						}
 					},
