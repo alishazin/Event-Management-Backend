@@ -173,7 +173,117 @@ function initialize(app, UserModel, EventModel) {
             { safe: true, multi: false }
         )
 
-        return res.status(200).send("sadasd")
+        return res.status(200).send("Bill Deleted Successfuly")
+
+    })
+
+    app.post("/api/bill/respond-to-bill", authMiddleware.restrictAccess(app, UserModel, ["volunteer"]))
+    app.post("/api/bill/respond-to-bill", async (req, res) => {
+
+        const { event_id, sub_event_id, bill_id, status, message } = req.body
+
+        // Required field validation
+        
+        validator = utils.validateRequired([event_id, sub_event_id, bill_id, status], ["event_id", "sub_event_id", "bill_id", "status"])
+        if (!validator.is_valid) {
+            return res.status(400).send({
+                "err_msg": validator.err_msg,
+                "field": validator.err_msg.split(" ")[0]
+            })
+        }
+
+        // event_id validation
+
+        const event = await eventObj.getEventById(event_id, EventModel);
+        if (!event) {
+            return res.status(400).send({
+                "err_msg": "invalid event_id",
+                "field": "event_id"
+            })
+        }
+
+        if (event.treasurer.toString() !== res.locals.user._id.toString()) {
+            return res.status(400).send({
+                "err_msg": "only treasurer can respond to a bill",
+                "field": "event_id"
+            })
+        }
+
+        // sub_event_id validation
+
+        const sub_event = eventObj.getSubEventById(sub_event_id, event);
+        if (!sub_event) {
+            return res.status(400).send({
+                "err_msg": "invalid sub_event_id",
+                "field": "sub_event_id"
+            })
+        }
+
+        // bill_id validation
+
+        const bill = billObj.getBillFromSubEventById(bill_id, sub_event);
+        if (!bill) {
+            return res.status(400).send({
+                "err_msg": "invalid bill_id",
+                "field": "bill_id"
+            })
+        }
+        
+        if (bill.status !== "waiting") {
+            return res.status(400).send({
+                "err_msg": "You have already responded to this bill",
+                "field": "bill_id"
+            })
+        }
+
+        // status validation
+
+        if (!['accepted', 'rejected'].includes(status)) {
+            return res.status(400).send({
+                "err_msg": "status must be one of ['accepted', 'rejected']",
+                "field": "status"
+            })
+        }
+
+        // message validation
+
+        if (message !== null && message !== undefined) {
+
+            if (!utils.checkType(message, String)) {
+                return res.status(400).send({
+                    "err_msg": "message must be a string",
+                    "field": "message"
+                })
+            }
+
+            validator = utils.checkTrimmedLength(message, 3, 100, "message")
+            if (!validator.is_valid) {
+                return res.status(400).send({
+                    "err_msg": validator.err_msg,
+                    "field": "message"
+                })
+            }
+
+        }
+
+        await EventModel.findOneAndUpdate(
+            { _id: event_id },
+            { $set: {
+                "sub_events.$[i].bills.$[j].status" : status,
+                "sub_events.$[i].bills.$[j].message_from_treasurer" : message ? message : undefined,
+                "sub_events.$[i].bills.$[j].bill_responded_date" : new Date()
+            }},
+            {
+                arrayFilters: [{
+                    "i._id" : sub_event_id
+                }, {
+                    "j._id" : bill_id
+                }]
+            },
+            { safe: true, multi: false }
+        )
+
+        return res.status(200).send("asdas")
 
     })
 
