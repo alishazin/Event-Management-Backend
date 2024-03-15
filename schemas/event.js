@@ -76,11 +76,21 @@ function checkIfSubEventExist(eventObj, subEventName) {
 
 }
 
-async function subEventToObject(obj, UserModel, {
+async function subEventToObject(obj, UserModel, user_id, {
     include_event_manager = true,
     include_participants = true,
     include_bills = true,
+    include_your_bills = true
 }) {
+
+    const your_bills = []
+
+    for (let bill of obj.bills) {
+        if (bill.uploaded_by.toString() === user_id) {
+            your_bills.push(await billObj.toObject(bill, UserModel))
+        }
+    }
+
     return {
         _id: obj._id,
         name: _.startCase(obj.name),
@@ -91,11 +101,12 @@ async function subEventToObject(obj, UserModel, {
         bills: include_bills ? await Promise.all(obj.bills.map(async (bill) => {
             return billObj.toObject(bill, UserModel)
         })) : undefined,
+        your_bills: include_your_bills ? your_bills : undefined,
     }
 }
 
 async function toObject(
-    obj, UserModel, {
+    obj, UserModel, user_id, {
         include_student_coordinator = true,
         include_treasurer = true,
         include_volunteers = true,
@@ -103,6 +114,7 @@ async function toObject(
         include_sub_event_event_manager = true,
         include_sub_event_participants = true,
         include_sub_event_bills = true,
+        include_sub_event_your_bills = true,
     } = {}
 ) {
     return {
@@ -121,10 +133,11 @@ async function toObject(
             return userObj.toObject(await userObj.getById(volunteer, UserModel), false)
         })) : undefined,
         sub_events: include_sub_events ? await Promise.all(obj.sub_events.map(async (sub_event) => {
-            return await subEventToObject(sub_event, UserModel, {
+            return await subEventToObject(sub_event, UserModel, user_id, {
                 include_event_manager: include_sub_event_event_manager,
                 include_participants: include_sub_event_participants,
-                include_bills: include_sub_event_bills
+                include_bills: include_sub_event_bills,
+                include_your_bills: include_sub_event_your_bills
             })
         })) : undefined,
     }

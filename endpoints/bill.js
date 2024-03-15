@@ -37,6 +37,13 @@ function initialize(app, UserModel, EventModel) {
             })
         }
 
+        if (event.treasurer?.toString() === res.locals.user._id.toString()) {
+            return res.status(400).send({
+                "err_msg": "treasurer of the event can't upload bill",
+                "field": "event_id"
+            })
+        }
+
         // sub_event_id validation
 
         const sub_event = eventObj.getSubEventById(sub_event_id, event)
