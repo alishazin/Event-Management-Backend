@@ -266,24 +266,30 @@ function initialize(app, UserModel, EventModel) {
 
         }
 
-        await EventModel.findOneAndUpdate(
-            { _id: event_id },
-            { $set: {
-                "sub_events.$[i].bills.$[j].status" : status,
-                "sub_events.$[i].bills.$[j].message_from_treasurer" : message ? message : undefined,
-                "sub_events.$[i].bills.$[j].bill_responded_date" : new Date()
-            }},
-            {
-                arrayFilters: [{
-                    "i._id" : sub_event_id
-                }, {
-                    "j._id" : bill_id
-                }]
-            },
-            { safe: true, multi: false }
-        )
+        // await EventModel.findOneAndUpdate(
+        //     { _id: event_id },
+        //     { $set: {
+        //         "sub_events.$[i].bills.$[j].status" : status,
+        //         "sub_events.$[i].bills.$[j].message_from_treasurer" : message ? message : undefined,
+        //         "sub_events.$[i].bills.$[j].bill_responded_date" : new Date()
+        //     }},
+        //     {
+        //         arrayFilters: [{
+        //             "i._id" : sub_event_id
+        //         }, {
+        //             "j._id" : bill_id
+        //         }]
+        //     },
+        //     { safe: true, multi: false }
+        // )
+        
+        bill.status = status
+        bill.message_from_treasurer = message ? message : undefined
+        bill.bill_responded_date = new Date()
 
-        return res.status(200).send("asdas")
+        await event.save()
+
+        return res.status(200).send(await billObj.toObject(bill, UserModel))
 
     })
 
