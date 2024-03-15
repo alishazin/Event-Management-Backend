@@ -339,7 +339,7 @@ function changePasswordEndpoint(app, UserModel) {
         res.locals.user.password = hash
         await res.locals.user.save()
 
-        res.status(200).send(userObj.toObjectres.locals.user)
+        res.status(200).send(userObj.toObject(res.locals.user))
 
     })
 
