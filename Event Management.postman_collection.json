@@ -22,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"type\": \"studentcoordinator\", // one of [studentcoordinator, volunteer, hod]\r\n    \"email\": \"arbitary@gmail.com\",\r\n    \"name\": \"arbitary\",\r\n    \"password\": \"12345678\",\r\n    \"department\": \"cse\" // only required for type: hod\r\n}",
+							"raw": "{\r\n    \"type\": \"volunteer\", // one of [studentcoordinator, volunteer, hod]\r\n    \"email\": \"felix@gmail.com\",\r\n    \"name\": \"Joao Felix\",\r\n    \"password\": \"12345678\",\r\n    \"department\": \"cse\" // only required for type: hod\r\n}\r\n\r\n// all users can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -236,6 +236,12 @@
 								"key": "session_token",
 								"value": "9e20b645-a2e0-4a91-b260-cc3edee24cc6",
 								"type": "text"
+							},
+							{
+								"key": "admin-access-code",
+								"value": "044453c2-e45a-4c5d-91b5-c3c14a483d61",
+								"type": "text",
+								"disabled": true
 							}
 						],
 						"body": {
@@ -273,7 +279,7 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "88f6c634-584d-41d4-856a-f3c55b9e936a",
+								"value": "9e20b645-a2e0-4a91-b260-cc3edee24cc6",
 								"type": "text"
 							},
 							{
