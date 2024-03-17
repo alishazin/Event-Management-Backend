@@ -177,7 +177,7 @@ function initialize(app, UserModel, EventModel, RequestModel) {
     app.get("/api/request/get-all-event", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator"]))
     app.get("/api/request/get-all-event", async (req, res) => {
 
-        const { event_id } = req.body
+        const { event_id } = req.query
 
         const returnData = []
 
