@@ -250,7 +250,10 @@ function getEventEndpoint(app, UserModel, EventModel) {
             (res.locals.userType === "studentcoordinator" && event.student_coordinator?.toString() === res.locals.user._id.toString()) ||
             (res.locals.userType === "volunteer" && event.treasurer?.toString() === res.locals.user._id.toString())
         ) {
-            return res.status(200).send(await eventObj.toObject(event, UserModel, res.locals.user?._id.toString()))
+            return res.status(200).send(await eventObj.toObject(event, UserModel, res.locals.user?._id.toString(), {
+                include_sub_event_bills: false,
+                include_sub_event_your_bills: false
+            }))
         }
 
         // checks if an event_manager
@@ -265,7 +268,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
                 include_sub_event_event_manager: false,
                 include_sub_event_participants: true,
                 include_sub_event_bills: false,
-                include_sub_event_your_bills: true
+                include_sub_event_your_bills: false
             })
 
             result.sub_events = await Promise.all(result.sub_events.map(async (sub_event_obj) => {
@@ -276,8 +279,8 @@ function getEventEndpoint(app, UserModel, EventModel) {
                     return await eventObj.subEventToObject(sub_event_obj_full, UserModel, res.locals.user._id.toString(), {
                         include_event_manager: true,
                         include_participants: true,
-                        include_bills: true,
-                        include_your_bills: true  
+                        include_bills: false,
+                        include_your_bills: false  
                     })
                 } else {
                     return sub_event_obj
@@ -298,7 +301,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
                 include_sub_event_event_manager: false,
                 include_sub_event_participants: true,
                 include_sub_event_bills: false,
-                include_sub_event_your_bills: true
+                include_sub_event_your_bills: false
             }))
         }
 

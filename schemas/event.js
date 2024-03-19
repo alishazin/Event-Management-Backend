@@ -200,11 +200,14 @@ function checkIfEventManagerExistById(event_manager_id, eventObj) {
     return found
 }
 
-function checkIfUserPartOfEvent(user_id, eventObj) {
+function checkIfUserPartOfEvent(user_id, eventObj, {
+    check_studentcoordinator = false
+}) {
     return (
         checkIfEventManagerExistById(user_id, eventObj) ||
         checkIfVolunteerExistById(user_id, eventObj) ||
-        (eventObj.treasurer ? eventObj.treasurer.toString() === user_id : 0)
+        (eventObj.treasurer ? eventObj.treasurer.toString() === user_id : 0) ||
+        (check_studentcoordinator ? eventObj.student_coordinator.toString() === user_id : 0)
     )
 }
 

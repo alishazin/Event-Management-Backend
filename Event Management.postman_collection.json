@@ -279,7 +279,7 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "9e20b645-a2e0-4a91-b260-cc3edee24cc6",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
 								"type": "text"
 							},
 							{
@@ -337,13 +337,8 @@
 							}
 						],
 						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"name\": \"Victor\",\r\n    \"email\": \"ssawewa@gmail.com\",\r\n    \"contact_no\": \"9876543212\",\r\n    \"college\": \"BSA Crescent\"\r\n}\r\n\r\n// only admin can access this endpoint",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
+							"mode": "formdata",
+							"formdata": []
 						},
 						"url": {
 							"raw": "http://localhost:3000/api/participant/add",
@@ -940,7 +935,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"description\": \"Bill for aws\",\r\n    \"img\": \"adsad\"\r\n}\r\n\r\n// can be uploaded student_coordinator and volunteers(event_managers and volunteers)",
+							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"description\": \"Bill for aws\",\r\n    \"img\": \"https://images.pexels.com/photos/20427618/pexels-photo-20427618/free-photo-of-a-woman-walking-down-a-sidewalk-with-a-blue-and-white-tile-mural.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2\"\r\n}\r\n\r\n// can be uploaded student_coordinator and volunteers(event_managers and volunteers)",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1030,6 +1025,55 @@
 								"api",
 								"bill",
 								"respond-to-bill"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Bills",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "9e20b645-a2e0-4a91-b260-cc3edee24cc6",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/bill/get-all?event_id=65ec9f39159293c770fb0bfd&sub_event_id=65eca2bc2dc0f7961ad6bcaf",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"bill",
+								"get-all"
+							],
+							"query": [
+								{
+									"key": "event_id",
+									"value": "65ec9f39159293c770fb0bfd"
+								},
+								{
+									"key": "sub_event_id",
+									"value": "65eca2bc2dc0f7961ad6bcaf"
+								}
 							]
 						}
 					},
