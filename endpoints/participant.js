@@ -8,6 +8,8 @@ const utils = require("../utils/utils.js")
 const _ = require("lodash")
 const { v4: uuidv4 } = require('uuid')
 const { default: mongoose } = require("mongoose")
+const fs = require("fs");
+const { parse } = require("csv-parse");
 
 function initialize(app, UserModel, EventModel) {
 
@@ -242,6 +244,217 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
         res.send(returnObj)
 
     })
+    
+    app.post("/api/participant/add-csv", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator", "volunteer"]))
+    app.post("/api/participant/add-csv", async (req, res) => {
+
+        const { event_id, sub_event_id } = req.body
+        const { csv_file } = req.files
+
+        // Required field validation
+        
+        validator = utils.validateRequired([event_id, sub_event_id, csv_file], ["event_id", "sub_event_id", "csv_file (as file)"])
+        if (!validator.is_valid) {
+            return res.status(400).send({
+                "err_msg": validator.err_msg,
+                "field": validator.err_msg.split(" ")[0]
+            })
+        } 
+
+        // event_id validation
+
+        const event = await eventObj.getEventById(event_id, EventModel)
+        if(!event) {
+            return res.status(400).send({
+                "err_msg": "invalid event_id",
+                "field": "event_id"
+            })
+        }
+
+        if (!eventObj.checkIfUserPartOfEvent(res.locals.user._id.toString(), event, {
+            check_studentcoordinator: true
+        })) {
+            return res.status(400).send({
+                "err_msg": "User must be part of the event to add participants",
+                "field": "event_id"
+            })
+        }
+
+        // sub_event_id validation
+
+        const sub_event = eventObj.getSubEventById(sub_event_id, event)
+        if(!sub_event) {
+            return res.status(400).send({
+                "err_msg": "invalid sub_event_id",
+                "field": "sub_event_id"
+            })
+        }
+
+        // csv_file validation
+        
+        if (!(typeof csv_file === "object" && !Array.isArray(csv_file))) {
+            return res.status(400).send({
+                "err_msg": "only one file is allowed",
+                "field": "csv_file"
+            })
+        }
+
+        if (csv_file.type !== "text/csv") {
+            return res.status(400).send({
+                "err_msg": "csv_file must be a csv file",
+                "field": "csv_file"
+            })
+        }
+
+        validator = await validateCsv(csv_file, sub_event)
+
+        if (validator.status !== 200) {
+            return res.status(validator.status).send(validator.body)
+        }
+
+        sub_event.participants.push(...validator.formatted_data)
+        await event.save()
+
+        return res.status(200).send({
+            "info": `${validator.formatted_data.length} participants added.`,
+        })
+
+    })
+
+}
+
+function validateCsv(csv_file, sub_event) {
+    return new Promise((resolve) => {
+        
+        let count = 1
+        const all_emails = []
+        const formatted_data = []
+        
+        fs.createReadStream(csv_file.path)
+        .pipe(parse({ delimiter: ",", from_line: 1,relax_column_count: true }))
+        .on("data", function (row) {
+
+            row = removeEmptyFieldsFromRight(row) 
+
+            if (count === 1) {
+
+                if (!(
+                    row.length === 4 && 
+                    row[0].trim().toLowerCase() === "name" &&
+                    row[1].trim().toLowerCase() === "email" &&
+                    row[2].trim().toLowerCase() === "contact no" &&
+                    row[3].trim().toLowerCase() === "college"
+                )) {
+                    return resolve({status: 400, body: {
+                        "err_msg": "First row must be [name, email, contact no, college]",
+                        "field": "csv_file.1"
+                    }})
+                }
+
+            } else {
+
+                if (row.length !== 4) {
+                    return resolve({status: 400, body: {
+                        "err_msg": "All rows must have 4 values (name, email, contact no, College)",
+                        "field": `csv_file.${count}`
+                    }})
+                }
+
+                const [ name, email, contact_no, college ] = row
+
+                // name validation
+        
+                validator = utils.checkTrimmedLength(name, 3, 30, "name")
+                if (!validator.is_valid) {
+                    return resolve({status: 400, body: {
+                        "err_msg": validator.err_msg,
+                        "field": `csv_file.${count}.name`
+                    }})
+                }
+        
+                // email validation 
+        
+                if (!utils.validateEmail(email)) {
+                    return resolve({status: 400, body: {
+                        "err_msg": "invalid email",
+                        "field": `csv_file.${count}.email`
+                    }})
+                }
+
+                if (all_emails.includes(email.trim().toLowerCase())) {
+                    return resolve({status: 400, body: {
+                        "err_msg": `Email of a user repeats in row ${count}`,
+                        "field": `csv_file.${count}.email`
+                    }})
+                }
+        
+                let result = participantObj.getParticipantWithEmail(email, sub_event)
+                if (result) {
+                    return resolve({status: 400, body: {
+                        "err_msg": "A user with the same email exist",
+                        "field": `csv_file.${count}.email`
+                    }})
+                }
+
+                all_emails.push(email.trim().toLowerCase())
+        
+                // contact_no validation
+        
+                validator = utils.checkTrimmedLength(contact_no, 10, 12, "contact_no")
+                if (!validator.is_valid) {
+                    return resolve({status: 400, body: {
+                        "err_msg": validator.err_msg,
+                        "field": `csv_file.${count}.contact_no`
+                    }})
+                }
+        
+                // college validation
+        
+                if (!utils.checkType(college, String)) {
+                    return resolve({status: 400, body: {
+                        "err_msg": "college must be a string",
+                        "field": `csv_file.${count}.college`
+                    }})
+                }
+
+                validator = utils.checkTrimmedLength(college, 3, 50, "college")
+                if (!validator.is_valid) {
+                    return resolve({status: 400, body: {
+                        "err_msg": validator.err_msg,
+                        "field": `csv_file.${count}.college`
+                    }})
+                }
+
+                formatted_data.push({
+                    name: name,
+                    email: email,
+                    contact_no: contact_no,
+                    college: college
+                })
+
+            }
+
+            count++
+        })
+        .on("end", function () {
+            return resolve({status: 200, body: {}, formatted_data: formatted_data})
+        })
+        .on("error", function (error) {
+            console.log(error);
+            return resolve({status: 500, body: error})
+        });
+    })
+}
+
+function removeEmptyFieldsFromRight(row) {
+
+    for (let i=row.length-1; i>3; i--) {
+        if (row[i].trim().length === 0) {
+            row.splice(i,i)
+        }
+    }
+
+    return row
 
 }
 

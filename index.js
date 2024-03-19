@@ -3,6 +3,7 @@ require('dotenv').config()
 const express = require("express")
 const cors = require("cors")
 const mongoose = require("mongoose")
+const formData = require('express-form-data');
 
 const eventObj = require(`${__dirname}/schemas/event.js`)
 const invitationObj = require(`${__dirname}/schemas/invitation.js`)
@@ -29,6 +30,7 @@ if (process.env.PORT) {
 const app = express()
 app.use(cors())
 app.use(express.json({limit: "50mb"}))
+app.use(formData.parse())
 
 // Initialize Collections
 const EventModel = eventObj.initialize()
