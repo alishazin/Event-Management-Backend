@@ -321,6 +321,63 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
 
     })
 
+    app.get("/api/participant/get-all", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer"]))
+    app.get("/api/participant/get-all", async (req, res) => {
+
+        const { event_id, sub_event_id } = req.query
+
+        // Required field validation
+        
+        validator = utils.validateRequired([event_id, sub_event_id], ["event_id", "sub_event_id"])
+        if (!validator.is_valid) {
+            return res.status(400).send({
+                "err_msg": validator.err_msg,
+                "field": validator.err_msg.split(" ")[0]
+            })
+        } 
+
+        // event_id validation
+
+        const event = await eventObj.getEventById(event_id, EventModel)
+        if(!event) {
+            return res.status(400).send({
+                "err_msg": "invalid event_id",
+                "field": "event_id"
+            })
+        }
+
+        if (!(
+            res.locals.userType === "admin" ||
+            (res.locals.userType === "hod" && event.department === res.locals.user.department) ||
+            eventObj.checkIfUserPartOfEvent(res.locals.user._id.toString(), event, {
+                check_studentcoordinator: true
+            })
+        )) {
+            return res.status(400).send({
+                "err_msg": "User must be part of the event to access bills",
+                "field": "event_id"
+            })
+        }
+
+        // sub_event_id validation
+
+        const sub_event = eventObj.getSubEventById(sub_event_id, event)
+        if(!sub_event) {
+            return res.status(400).send({
+                "err_msg": "invalid sub_event_id",
+                "field": "sub_event_id"
+            })
+        }
+
+        return res.status(200).send(await eventObj.subEventToObject(sub_event, UserModel, res.locals.user?._id.toString(), {
+            include_event_manager: false,
+            include_participants: true,
+            include_bills: false,
+            include_your_bills: false
+        }))
+
+    })
+
 }
 
 function validateCsv(csv_file, sub_event) {

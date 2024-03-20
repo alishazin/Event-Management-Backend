@@ -325,9 +325,13 @@ function initialize(app, UserModel, EventModel) {
             })
         }
 
-        if (!eventObj.checkIfUserPartOfEvent(res.locals.user._id.toString(), event, {
-            check_studentcoordinator: true
-        })) {
+        if (!(
+            res.locals.userType === "admin" ||
+            (res.locals.userType === "hod" && event.department === res.locals.user.department) ||
+            eventObj.checkIfUserPartOfEvent(res.locals.user._id.toString(), event, {
+                check_studentcoordinator: true
+            })
+        )) {
             return res.status(400).send({
                 "err_msg": "User must be part of the event to access bills",
                 "field": "event_id"

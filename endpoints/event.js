@@ -251,6 +251,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
             (res.locals.userType === "volunteer" && event.treasurer?.toString() === res.locals.user._id.toString())
         ) {
             return res.status(200).send(await eventObj.toObject(event, UserModel, res.locals.user?._id.toString(), {
+                include_sub_event_participants: false,
                 include_sub_event_bills: false,
                 include_sub_event_your_bills: false
             }))
@@ -266,7 +267,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
                 include_treasurer: false,
                 include_volunteers: true,
                 include_sub_event_event_manager: false,
-                include_sub_event_participants: true,
+                include_sub_event_participants: false,
                 include_sub_event_bills: false,
                 include_sub_event_your_bills: false
             })
@@ -278,7 +279,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
                 if (sub_event_obj_full.event_manager?.toString() === res.locals.user._id.toString()) {
                     return await eventObj.subEventToObject(sub_event_obj_full, UserModel, res.locals.user._id.toString(), {
                         include_event_manager: true,
-                        include_participants: true,
+                        include_participants: false,
                         include_bills: false,
                         include_your_bills: false  
                     })
@@ -299,7 +300,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
                 include_treasurer: false,
                 include_volunteers: true,
                 include_sub_event_event_manager: false,
-                include_sub_event_participants: true,
+                include_sub_event_participants: false,
                 include_sub_event_bills: false,
                 include_sub_event_your_bills: false
             }))
