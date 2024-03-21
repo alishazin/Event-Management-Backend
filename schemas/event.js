@@ -202,7 +202,7 @@ function checkIfEventManagerExistById(event_manager_id, eventObj) {
 
 function checkIfUserPartOfEvent(user_id, eventObj, {
     check_studentcoordinator = false
-}) {
+} = {}) {
     return (
         checkIfEventManagerExistById(user_id, eventObj) ||
         checkIfVolunteerExistById(user_id, eventObj) ||
