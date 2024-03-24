@@ -1,0 +1,116 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Document</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Inter", Verdana, Geneva, Tahoma, sans-serif;
+        }
+        div.container {
+            width: 100%;
+            background-color: #e7e8f1;
+            padding: 80px 0;
+            padding-left: calc(50% - 250px);
+        }
+        div.main {
+            width: 500px;
+            max-width: 100%;
+            background-color: white;
+            transform: translateX(50%);
+            padding: 20px 30px;
+            border-radius: 10px;
+        }
+        h2 {
+            font-family: 'Inter';
+            font-weight: 700;
+            color: #025464;
+            font-size: 18px;
+        }
+        span {
+            font-family: "Inter";
+            font-weight: 300;
+            margin-right: 5px;
+            font-size: 11px;
+        }
+        p.bold {
+            font-weight: 500;
+            color: black;
+            font-size: 14px;
+        }
+        .header {
+            width: 100%;
+            height: fit-content;
+            position: relative;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #025464;
+        }
+        .header h2 {
+            display: inline-block;
+            width: 100%;
+            text-align: left;
+            margin-top: 50px;
+        }
+        .section {
+            border-bottom: 3px solid #025464;
+            margin-bottom: 20px;
+        }
+        .padded_box {
+            margin-left: 40px;
+            border-bottom: 1px solid #ddd;
+        }
+        .padded_box.no-border {
+            margin-left: 40px;
+            border-bottom: none;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <div class="main">
+            <div class="section">
+                <p>This email is sent to confirm your registration.</p>
+                <p>Details of the event and participant is provided below. <b>QR Code provided below can be used for validation on the day of event.</b></p>
+            </div>
+            <div class="section">
+                <div class="header">
+                    <h2>Event Details</h2>
+                </div>
+                <p class="bold"><span>Event:</span>{{event_name}}</p>
+                <p class="bold"><span>Date:</span>{{event_date}}</p>
+                <p class="bold"><span>Department:</span>{{event_dept}}</p>
+                <p class="bold"><span>Sub Event:</span>{{subevent_name}}</p>
+                {{#if eventmanager_name}}
+                    <p class="bold"><span>Event Manager:</span></p>
+                    <div class="padded_box">
+                        <p class="bold"><span>Name:</span>{{eventmanager_name}}</p>
+                        <p class="bold"><span>Email:</span>{{eventmanager_email}}</p>
+                    </div>
+                {{/if}}
+            </div>
+            <div class="section">
+                <div class="header">
+                    <h2>Participant Details</h2>
+                </div>
+                <p class="bold"><span>Name:</span>{{participant_name}}</p>
+                <p class="bold"><span>Email:</span>{{participant_email}}</p>
+                <p class="bold"><span>Contact No:</span>{{participant_contact}}</p>
+                <p class="bold"><span>College:</span>{{participant_college}}</p>
+                <p class="bold"><span>QR Code:</span></p>
+                <div class="padded_box no-border">
+                    <img src="cid:qrcode">
+                </div>
+            </div>
+            <p>Thank you.</p>
+            <p>Cres Days.</p>
+        </div>
+    </div>
+</body>
+</html>

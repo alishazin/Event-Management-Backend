@@ -1,8 +1,25 @@
 
 const _ = require('lodash');
+const QRCode = require('qrcode')
 
 const typeOf = (obj) => {
     return Object.getPrototypeOf(obj).constructor;
+}
+
+async function generateQRCode(data) {
+
+    let stringdata = JSON.stringify(data)
+    
+    let qrcode;
+    await QRCode.toDataURL(stringdata)
+    .then((url) => {
+        qrcode = url;
+    })
+    .catch((err) => {
+        console.error(err);
+    });
+
+    return qrcode
 }
 
 function validateRequired(values, order) {
@@ -161,4 +178,5 @@ module.exports = {
     isToday: isToday,
     isUrl: isUrl,
     isBase64, isBase64,
+    generateQRCode: generateQRCode
 }
