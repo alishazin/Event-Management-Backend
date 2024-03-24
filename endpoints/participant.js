@@ -5,6 +5,7 @@ const users = require("../schemas/extras/users.js")
 const userObj = require("../schemas/user.js")
 const eventObj = require("../schemas/event.js")
 const utils = require("../utils/utils.js")
+const emailClient = require("../utils/email.js")
 const _ = require("lodash")
 const { v4: uuidv4 } = require('uuid')
 const { default: mongoose } = require("mongoose")
@@ -134,16 +135,19 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
         }
 
         const participant_id = new mongoose.Types.ObjectId();
-
-        sub_event.participants.push({
+        const participant = {
             _id: participant_id,
             name: name,
             email: email,
             contact_no: contact_no,
             college: college
-        })
+        };
+
+        sub_event.participants.push(participant)
 
         await event.save()
+
+        await emailClient.sendConfirmationEmail(email, event, sub_event, participant, UserModel)
 
         res.send({
             _id: participant_id,
@@ -315,6 +319,15 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
         sub_event.participants.push(...validator.formatted_data)
         await event.save()
 
+        // Send emails (one in 5 seconds)
+        let count = 0
+        for (let participant of validator.formatted_data) {
+            setTimeout(() => {
+                emailClient.sendConfirmationEmail(participant.email, event, sub_event, participant, UserModel)        
+            }, 5000 * count)
+            count++;
+        }
+
         return res.status(200).send({
             "info": `${validator.formatted_data.length} participants added.`,
         })
@@ -453,7 +466,7 @@ function validateCsv(csv_file, sub_event) {
                     }})
                 }
 
-                all_emails.push(email.trim().toLowerCase())
+                // all_emails.push(email.trim().toLowerCase())
         
                 // contact_no validation
         
@@ -483,6 +496,7 @@ function validateCsv(csv_file, sub_event) {
                 }
 
                 formatted_data.push({
+                    _id: new mongoose.Types.ObjectId(),
                     name: name,
                     email: email,
                     contact_no: contact_no,
