@@ -37,12 +37,22 @@ function initialize(app, UserModel, EventModel) {
             })
         }
 
-        if (event.treasurer?.toString() === res.locals.user._id.toString()) {
+        if (!eventObj.checkIfUserPartOfEvent(res.locals.user._id.toString(), event, {
+            check_studentcoordinator: true
+        })) {
             return res.status(400).send({
-                "err_msg": "treasurer of the event can't upload bill",
+                "err_msg": "User must be part of the event to upload bills",
                 "field": "event_id"
             })
         }
+
+        // if (event.treasurer?.toString() === res.locals.user._id.toString()) {
+        //     return res.status(400).send({
+        //         "err_msg": "treasurer of the event can't upload bill",
+        //         "field": "event_id"
+        //     })
+        // }
+
 
         // sub_event_id validation
 
