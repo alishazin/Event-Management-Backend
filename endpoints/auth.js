@@ -249,10 +249,21 @@ function verifySessionTokenEndpoint(app, UserModel, EventModel) {
         }
 
         const all_events = await EventModel.find()
+        const events_as_hod = []
         const events_as_studentcoordinator = []
         const events_as_treasurer = []
         const events_as_eventmanager = []
         const events_as_volunteer = []
+
+        if (user.type === "hod") {
+
+            for (let event of all_events) {
+                if (event.department === user.department) {
+                    events_as_hod.push(event._id.toString())
+                }
+            }    
+
+        }
 
         if (user.type === "studentcoordinator") {
 
@@ -292,6 +303,7 @@ function verifySessionTokenEndpoint(app, UserModel, EventModel) {
 
         return res.status(200).send({
             ...userObj.toObject(user),
+            events_as_hod : events_as_hod,
             events_as_studentcoordinator : events_as_studentcoordinator,
             events_as_treasurer : events_as_treasurer,
             events_as_eventmanager : events_as_eventmanager,
