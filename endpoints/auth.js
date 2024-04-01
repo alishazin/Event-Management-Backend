@@ -254,6 +254,7 @@ function verifySessionTokenEndpoint(app, UserModel, EventModel) {
         const events_as_treasurer = []
         const events_as_eventmanager = []
         const events_as_volunteer = []
+        const events_as_participant = []
 
         if (user.type === "hod") {
 
@@ -277,21 +278,37 @@ function verifySessionTokenEndpoint(app, UserModel, EventModel) {
 
         if (user.type === "volunteer") {
 
+            // for (let event of all_events) {
+            //     if (event.treasurer?.toString() === user._id.toString()) {
+            //         events_as_treasurer.push(event._id.toString())
+            //     }
+            // }  
+
+            // for (let event of all_events) {
+            //     for (let sub_event of event.sub_events) {
+            //         if (sub_event.event_manager?.toString() === user._id.toString()) {
+            //             events_as_eventmanager.push(event._id.toString())
+            //         }
+            //     }
+            // }     
+
+            // for (let event of all_events) {
+            //     for (let volunteer of event.volunteers) {
+            //         if (volunteer.toString() === user._id.toString()) {
+            //             events_as_volunteer.push(event._id.toString())
+            //         }
+            //     }
+            // }     
+            
             for (let event of all_events) {
                 if (event.treasurer?.toString() === user._id.toString()) {
                     events_as_treasurer.push(event._id.toString())
                 }
-            }  
-
-            for (let event of all_events) {
                 for (let sub_event of event.sub_events) {
                     if (sub_event.event_manager?.toString() === user._id.toString()) {
                         events_as_eventmanager.push(event._id.toString())
                     }
                 }
-            }     
-
-            for (let event of all_events) {
                 for (let volunteer of event.volunteers) {
                     if (volunteer.toString() === user._id.toString()) {
                         events_as_volunteer.push(event._id.toString())
@@ -301,13 +318,31 @@ function verifySessionTokenEndpoint(app, UserModel, EventModel) {
 
         }
 
+        if (user.type === "participant") {
+
+            for (let event of all_events) {
+                for (let sub_event of event.sub_events) {
+                    for (let participant of sub_event.participants) {
+                        if (participant.id_if_self_enrolled?.toString() === user._id.toString()) {
+                            events_as_participant.push({
+                                event_id: event._id.toString(),
+                                sub_event_id: sub_event._id.toString()
+                            })
+                        }
+                    }
+                }
+            }   
+
+        }
+
         return res.status(200).send({
             ...userObj.toObject(user),
             events_as_hod : events_as_hod,
             events_as_studentcoordinator : events_as_studentcoordinator,
             events_as_treasurer : events_as_treasurer,
             events_as_eventmanager : events_as_eventmanager,
-            events_as_volunteer : events_as_volunteer
+            events_as_volunteer : events_as_volunteer,
+            events_as_participant : events_as_participant
         })
 
     })
@@ -316,7 +351,7 @@ function verifySessionTokenEndpoint(app, UserModel, EventModel) {
 
 function changePasswordEndpoint(app, UserModel) {
 
-    app.post("/api/auth/change-password", authMiddleware.restrictAccess(app, UserModel, ["hod", "studentcoordinator", "volunteer"]))
+    app.post("/api/auth/change-password", authMiddleware.restrictAccess(app, UserModel, ["hod", "studentcoordinator", "volunteer", "participant"]))
     app.post("/api/auth/change-password", async (req, res) => {
 
         const { old_password, new_password } = req.body

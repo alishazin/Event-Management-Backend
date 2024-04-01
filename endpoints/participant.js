@@ -159,6 +159,119 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
 
     })
 
+    app.post("/api/participant/enroll", authMiddleware.restrictAccess(app, UserModel, ["participant"]))
+    app.post("/api/participant/enroll", async (req, res) => {
+
+        const { event_id, sub_event_id, contact_no, college } = req.body
+
+        const name = res.locals.user.name
+        const email = res.locals.user.email
+
+        // Required field validation
+        
+        validator = utils.validateRequired([event_id, sub_event_id, contact_no, college], ["event_id", "sub_event_id", "contact_no", "college"])
+        if (!validator.is_valid) {
+            return res.status(400).send({
+                "err_msg": validator.err_msg,
+                "field": validator.err_msg.split(" ")[0]
+            })
+        }
+
+        // event_id validation
+
+        if (!utils.checkType(event_id, String)) {
+            return res.status(400).send({
+                "err_msg": "event_id must be a string",
+                "field": "event_id"
+            })
+        }
+
+        const event = await eventObj.getEventById(event_id, EventModel)
+        if (!event) {
+            return res.status(400).send({
+                "err_msg": "event_id is invalid",
+                "field": "event_id"
+            })
+        }
+
+        // sub_event_id validation
+
+        if (!utils.checkType(sub_event_id, String)) {
+            return res.status(400).send({
+                "err_msg": "sub_event_id must be a string",
+                "field": "sub_event_id"
+            })
+        }
+
+        const sub_event = eventObj.getSubEventById(sub_event_id, event)
+        if (!sub_event) {
+            return res.status(400).send({
+                "err_msg": "sub_event_id is invalid",
+                "field": "sub_event_id"
+            })
+        }
+
+        // email validation 
+
+        let result = participantObj.getParticipantWithEmail(email, sub_event)
+        if (result) return res.status(400).send({
+            "err_msg": "A participant with the same email is enrolled in the sub-event",
+            "field": "email"
+        })
+
+        // contact_no validation
+
+        if (!utils.checkType(contact_no, String)) {
+            return res.status(400).send({
+                "err_msg": "contact_no must be a string",
+                "field": "contact_no"
+            })
+        }
+
+        validator = utils.checkTrimmedLength(contact_no, 10, 12, "contact_no")
+        if (!validator.is_valid) {
+            return res.status(400).send({
+                "err_msg": validator.err_msg,
+                "field": "name"
+            })
+        }
+
+        // college validation
+
+        if (!utils.checkType(college, String)) {
+            return res.status(400).send({
+                "err_msg": "college must be a string",
+                "field": "college"
+            })
+        }
+
+        const participant_id = new mongoose.Types.ObjectId();
+        const participant = {
+            _id: participant_id,
+            name: name,
+            email: email,
+            contact_no: contact_no,
+            college: college,
+            is_self_enrolled: true,
+            id_if_self_enrolled: res.locals.user._id
+        };
+
+        sub_event.participants.push(participant)
+
+        await event.save()
+
+        await emailClient.sendConfirmationEmail(email, event, sub_event, participant, UserModel)
+
+        res.send({
+            _id: participant_id,
+            name: _.startCase(name.toLowerCase()),
+            email: email.trim(),
+            contact_no: contact_no.trim(),
+            college: _.startCase(college.toLowerCase())
+        });
+
+    })
+
     app.post("/api/participant/get", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator", "volunteer"]))
     app.post("/api/participant/get", async (req, res) => {
 

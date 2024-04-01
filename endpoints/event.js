@@ -206,7 +206,7 @@ function createSubEventEndpoint(app, UserModel, EventModel) {
 
 function getEventEndpoint(app, UserModel, EventModel) {
 
-    app.get("/api/event/get-all", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer"]))
+    app.get("/api/event/get-all", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer", "participant"]))
     app.get("/api/event/get-all", async (req, res) => {
 
         const resData = []
@@ -231,7 +231,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
 
     })
 
-    app.get("/api/event/get-one", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer"]))
+    app.get("/api/event/get-one", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer", "participant"]))
     app.get("/api/event/get-one", async (req, res) => {
 
         const { id } = req.query
