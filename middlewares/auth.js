@@ -34,7 +34,7 @@ function restrictAccess(app, UserModel, allowed_users) {
 
         }
 
-        if ((allowed_users.includes("hod") || allowed_users.includes("studentcoordinator") || allowed_users.includes("volunteer")) && !authenticated) {
+        if ((allowed_users.includes("hod") || allowed_users.includes("studentcoordinator") || allowed_users.includes("volunteer") || allowed_users.includes("participant"))  && !authenticated) {
 
             const { session_token } = req.headers
             

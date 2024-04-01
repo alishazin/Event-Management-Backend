@@ -26,6 +26,15 @@ const participantSchema = mongoose.Schema({
         trim: true,
         lowercase: true,
     },
+    is_self_enrolled: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    id_if_self_enrolled: {
+        type: mongoose.Types.ObjectId,
+        required: false
+    },
     is_verified: {
         type: Boolean,
         required: true,
