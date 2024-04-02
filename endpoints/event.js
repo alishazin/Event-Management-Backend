@@ -320,6 +320,74 @@ function getEventEndpoint(app, UserModel, EventModel) {
 
     })
 
+    app.get("/api/event/get-on-date", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer", "participant"]))
+    app.get("/api/event/get-on-date", async (req, res) => {
+
+        const { date, include_sub_events } = req.query
+
+        // include_sub_events validation
+
+        if (include_sub_events === undefined || include_sub_events === null) {
+            return res.status(400).send({
+                "err_msg": "include_sub_events is required",
+                "field": "include_sub_events"
+            }) 
+        }
+
+        if (include_sub_events !== '0' && include_sub_events !== '1') {
+            return res.status(400).send({
+                "err_msg": "include_sub_events must be either 0 or 1",
+                "field": "include_sub_events"
+            }) 
+        }
+
+        // date validation
+
+        const dateObj = utils.validateDate(date)
+        if (!dateObj) {
+            return res.status(400).send({
+                "err_msg": "date must be of format Y-m-d",
+                "field": "date"
+            })
+        }
+
+        const events = await EventModel.find({
+            $or: [
+                {$and: [
+                    {date_from: dateObj},        
+                    {date_to: null},        
+                ]},
+                {$and: [
+                    {date_from: {$lte: dateObj}},        
+                    {date_to: {$gte: dateObj}},        
+                ]}
+            ]
+        })
+        
+        const returnData = []
+        
+        for (let event of events) {
+
+            returnData.push({
+                data: await eventObj.toObject(event, UserModel, null, {
+                    include_student_coordinator: false,
+                    include_treasurer: false,
+                    include_volunteers: false,
+                    include_sub_events: Number(include_sub_events),
+                    include_sub_event_event_manager: false,
+                    include_sub_event_participants: false,
+                    include_sub_event_bills: false,
+                    include_sub_event_your_bills: false,
+                }),
+                day_count: ((dateObj.getTime() - event.date_from.getTime()) / 86400000) + 1
+            })
+
+        }
+
+        return res.send(returnData)
+
+    })
+
 
 }
 

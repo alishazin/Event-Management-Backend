@@ -22,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"type\": \"volunteer\", // one of [studentcoordinator, volunteer, hod]\r\n    \"email\": \"felix@gmail.com\",\r\n    \"name\": \"Joao Felix\",\r\n    \"password\": \"12345678\",\r\n    \"department\": \"cse\" // only required for type: hod\r\n}\r\n\r\n// all users can access this endpoint",
+							"raw": "{\r\n    \"type\": \"participant\", // one of [studentcoordinator, volunteer, hod, participant]\r\n    \"email\": \"alishazin1029@gmail.com\",\r\n    \"name\": \"Ali Shazin\",\r\n    \"password\": \"12345678\",\r\n    \"department\": \"cse\" // only required for type: hod\r\n}\r\n\r\n// all users can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -52,7 +52,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"felix@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}\r\n\r\n// all users can access this endpoint",
+							"raw": "{\r\n    \"email\": \"alishazin1029@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}\r\n\r\n// all users can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -88,7 +88,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"session_token\": \"88f6c634-584d-41d4-856a-f3c55b9e936a\"\r\n}\r\n\r\n// all users can access this endpoint\r\n\r\n// events_as_studentcoordinator, events_as_treasurer, events_as_eventmanager and events_as_volunteer contains ID of events which this user is part of",
+							"raw": "{\r\n    \"session_token\": \"7f98db6e-2ac5-4fd0-8037-96dd9e5da779\"\r\n}\r\n\r\n// all users can access this endpoint\r\n\r\n// events_as_studentcoordinator, events_as_treasurer, events_as_eventmanager and events_as_volunteer contains ID of events which this user is part of",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -118,7 +118,7 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "44f284d5-66e1-4ee0-b006-667042d16269",
+								"value": "7f98db6e-2ac5-4fd0-8037-96dd9e5da779",
 								"type": "text"
 							}
 						],
@@ -234,7 +234,7 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "9e20b645-a2e0-4a91-b260-cc3edee24cc6",
+								"value": "ae58af86-8364-4a60-94e1-e6abd7e335d6",
 								"type": "text"
 							},
 							{
@@ -279,7 +279,7 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
+								"value": "ae58af86-8364-4a60-94e1-e6abd7e335d6",
 								"type": "text"
 							},
 							{
@@ -319,6 +319,61 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Event By Date",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
+								"type": "text"
+							},
+							{
+								"key": "admin-access-code",
+								"value": "044453c2-e45a-4c5d-91b5-c3c14a483d61",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/event/get-on-date?date=2024-03-11&include_sub_events=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"event",
+								"get-on-date"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2024-03-11"
+								},
+								{
+									"key": "include_sub_events",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -338,7 +393,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"name\": \"Victor\",\r\n    \"email\": \"ssawewa@gmail.com\",\r\n    \"contact_no\": \"9876543212\",\r\n    \"college\": \"BSA Crescent\"\r\n}\r\n\r\n// only admin can access this endpoint",
+							"raw": "{\r\n    \"event_id\": \"65edb061a5ddd67dad20d302\",\r\n    \"sub_event_id\": \"65edb098a5ddd67dad20d311\",\r\n    \"name\": \"Ali Shazin\",\r\n    \"email\": \"alishazin1029@gmail.com\",\r\n    \"contact_no\": \"8138830267\",\r\n    \"college\": \"BSA Crescent\"\r\n}\r\n\r\n// only admin can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -356,6 +411,42 @@
 								"api",
 								"participant",
 								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Enroll For Participant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "ae58af86-8364-4a60-94e1-e6abd7e335d6",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"event_id\": \"65edb061a5ddd67dad20d302\",\r\n    \"sub_event_id\": \"65edb098a5ddd67dad20d311\",\r\n    \"contact_no\": \"8138830267\",\r\n    \"college\": \"BSA Crescent\"\r\n}\r\n\r\n// only admin can access this endpoint",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/participant/enroll",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"participant",
+								"enroll"
 							]
 						}
 					},
@@ -414,7 +505,7 @@
 								{
 									"key": "csv_file",
 									"type": "file",
-									"src": "/C:/myhub/event-management-backend/aa.csv"
+									"src": "/C:/myhub/event-management-backend/sample.csv"
 								},
 								{
 									"key": "event_id",
@@ -1030,7 +1121,7 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "9e20b645-a2e0-4a91-b260-cc3edee24cc6",
+								"value": "f2bda6aa-723e-47bf-ba1b-4f725df3dd11",
 								"type": "text"
 							}
 						],
@@ -1108,7 +1199,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"bill_id\": \"65f2020a9840a3b887b0e059\",\r\n    \"status\": \"rejected\", // accepted or rejected\r\n    \"message\": \"Good one mi amigo\" // not-required\r\n}\r\n\r\n// Can be accessed by the treasurer of the event, can only respond to a bill once",
+							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"bill_id\": \"6606fdf907e1b1790e2532cb\",\r\n    \"status\": \"accepted\", // accepted or rejected\r\n    \"message\": \"Good one mi amigo\" // not-required\r\n}\r\n\r\n// Can be accessed by the treasurer of the event, can only respond to a bill once",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1141,7 +1232,7 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "12773f35-af4f-4083-8413-051d0ddb20d5",
+								"value": "f2bda6aa-723e-47bf-ba1b-4f725df3dd11",
 								"type": "text"
 							}
 						],
