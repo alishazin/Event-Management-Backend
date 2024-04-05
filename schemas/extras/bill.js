@@ -16,6 +16,11 @@ const billSchema = mongoose.Schema({
         trim: true,
         required: true
     },
+    amount: {
+        type: Number,
+        default: 0,
+        required: true
+    },
     status: {
         type: String,
         enum: ['accepted', 'rejected', 'waiting'],
@@ -63,6 +68,7 @@ async function toObject(obj, UserModel, user_obj = null) {
             userObj.toObject(await userObj.getUserById(obj.uploaded_by._id, UserModel)),
         img: obj.img,
         description: obj.description,
+        amount: obj.amount,
         status: obj.status,
         message_from_treasurer: obj.message_from_treasurer ? obj.message_from_treasurer : null,
         bill_uploaded_date: obj.bill_uploaded_date ? obj.bill_uploaded_date : null,

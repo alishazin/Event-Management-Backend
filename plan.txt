@@ -45,3 +45,9 @@ notification 5 read
 
 - when getting all notification, make status to 'read'
 - when getting all unread notification, dont make status 'read'
+
+- amount field in bill. DONE
+- /summary for event (Total of bills, no. Of participants, organizing team, volunteers)
+- description field for sub-event
+- img field for event and sub-event
+- if someone log in with crescent mail (pass: 1234), if it doesnt exist, register them as new user and send session-id.

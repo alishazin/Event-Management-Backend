@@ -15,11 +15,11 @@ function initialize(app, UserModel, EventModel) {
     app.post("/api/bill/upload-bill", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator", "volunteer"]))
     app.post("/api/bill/upload-bill", async (req, res) => {
 
-        let { event_id, sub_event_id, img, description } = req.body
+        let { event_id, sub_event_id, img, description, amount } = req.body
 
         // Required field validation
         
-        validator = utils.validateRequired([event_id, sub_event_id, img, description], ["event_id", "sub_event_id", "img", "description"])
+        validator = utils.validateRequired([event_id, sub_event_id, img, description, amount], ["event_id", "sub_event_id", "img", "description", "amount"])
         if (!validator.is_valid) {
             return res.status(400).send({
                 "err_msg": validator.err_msg,
@@ -102,13 +102,23 @@ function initialize(app, UserModel, EventModel) {
             img = location
         }
 
+        // amount validation
+
+        if (!(utils.checkType(amount, Number) && amount >= 0)) {
+            return res.status(400).send({
+                "err_msg": "amount must be a positive number",
+                "field": "amount"
+            })
+        }        
+
         const billId = new mongoose.Types.ObjectId()
 
         sub_event.bills.push({
             _id: billId,
             uploaded_by: res.locals.user._id,
             img: img,
-            description: description
+            description: description,
+            amount: amount,
         })
 
         await event.save()
