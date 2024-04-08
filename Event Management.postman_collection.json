@@ -22,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"type\": \"participant\", // one of [studentcoordinator, volunteer, hod, participant]\r\n    \"email\": \"alishazin1029@gmail.com\",\r\n    \"name\": \"Ali Shazin\",\r\n    \"password\": \"12345678\",\r\n    \"department\": \"cse\" // only required for type: hod\r\n}\r\n\r\n// all users can access this endpoint",
+							"raw": "{\r\n    \"type\": \"volunteer\", // one of [studentcoordinator, volunteer, hod, participant]\r\n    \"email\": \"dejong@gmail.com\",\r\n    \"name\": \"De Jong\",\r\n    \"s\": \"https://images.pexels.com/photos/20732688/pexels-photo-20732688/free-photo-of-man-in-suit-standing-in-lake.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2\",\r\n    \"password\": \"12345678\",\r\n    \"department\": \"cse\" // only required for type: hod\r\n}\r\n\r\n// only admin can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -52,7 +52,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"alishazin1029@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}\r\n\r\n// all users can access this endpoint",
+							"raw": "{\r\n    \"email\": \"220071601032@crescent.education\",\r\n    \"password\": \"1234\"\r\n}\r\n\r\n// all users can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -88,7 +88,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"session_token\": \"7f98db6e-2ac5-4fd0-8037-96dd9e5da779\"\r\n}\r\n\r\n// all users can access this endpoint\r\n\r\n// events_as_studentcoordinator, events_as_treasurer, events_as_eventmanager and events_as_volunteer contains ID of events which this user is part of",
+							"raw": "{\r\n    \"session_token\": \"a7fe6194-d42f-4030-bd61-7f4bfddf7d72\"\r\n}\r\n\r\n// all users can access this endpoint\r\n\r\n// events_as_studentcoordinator, events_as_treasurer, events_as_eventmanager, events_as_participant and events_as_volunteer contains ID of events which this user is part of",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -146,6 +146,42 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Change Profile",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "a7fe6194-d42f-4030-bd61-7f4bfddf7d72",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"profile\": null\r\n    // use profile: null to remove existing profile pic \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/auth/change-profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"auth",
+								"change-profile"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -159,13 +195,13 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "388b14cb-bcb4-4140-afb7-cf6bcada2fc4",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Min Blogging Shit\",\r\n    \"date_from\": \"2024-03-11\",\r\n    \"date_to\": \"2024-03-13\", // exclude this field if the event is for a day\r\n    \"department\": \"cse\"\r\n}\r\n\r\n// only studentcoordinator accounts can access this endpoint",
+							"raw": "{\r\n    \"name\": \"Carnival\",\r\n    \"date_from\": \"2024-04-11\",\r\n    \"date_to\": \"2024-04-13\", // exclude this field if the event is for a day\r\n    \"department\": \"cse\",\r\n    \"img\": \"https://images.pexels.com/photos/20732688/pexels-photo-20732688/free-photo-of-man-in-suit-standing-in-lake.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2\"\r\n}\r\n\r\n// only studentcoordinator accounts can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -201,7 +237,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"name\": \"Thengakola Extra\"\r\n}\r\n\r\n// only studentcoordinator of the evenet can access this endpoint",
+							"raw": "{\r\n    \"event_id\": \"6613b5d2cce1dcb3cc798054\",\r\n    \"name\": \"Marathon\",\r\n    \"description\": \"You heard it right!\",\r\n    \"img\": \"https://images.pexels.com/photos/20732688/pexels-photo-20732688/free-photo-of-man-in-suit-standing-in-lake.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2\"\r\n}\r\n\r\n// only studentcoordinator of the evenet can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -234,7 +270,7 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "ae58af86-8364-4a60-94e1-e6abd7e335d6",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
 								"type": "text"
 							},
 							{
@@ -279,7 +315,7 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "ae58af86-8364-4a60-94e1-e6abd7e335d6",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
 								"type": "text"
 							},
 							{
@@ -299,7 +335,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/event/get-one?id=65ec9f39159293c770fb0bfd",
+							"raw": "http://localhost:3000/api/event/get-one?id=6613b5d2cce1dcb3cc798054",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -313,7 +349,7 @@
 							"query": [
 								{
 									"key": "id",
-									"value": "65ec9f39159293c770fb0bfd"
+									"value": "6613b5d2cce1dcb3cc798054"
 								}
 							]
 						}
@@ -374,6 +410,57 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Event Summary",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
+								"type": "text"
+							},
+							{
+								"key": "admin-access-code",
+								"value": "044453c2-e45a-4c5d-91b5-c3c14a483d61",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/event/summary?id=6613b5d2cce1dcb3cc798054",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"event",
+								"summary"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "6613b5d2cce1dcb3cc798054"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -393,7 +480,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"event_id\": \"65edb061a5ddd67dad20d302\",\r\n    \"sub_event_id\": \"65edb098a5ddd67dad20d311\",\r\n    \"name\": \"Ali Shazin\",\r\n    \"email\": \"alishazin1029@gmail.com\",\r\n    \"contact_no\": \"8138830267\",\r\n    \"college\": \"BSA Crescent\"\r\n}\r\n\r\n// only admin can access this endpoint",
+							"raw": "{\r\n    \"event_id\": \"6613b5d2cce1dcb3cc798054\",\r\n    \"sub_event_id\": \"6613b5f3cce1dcb3cc798059\",\r\n    \"name\": \"Ali Shazin\",\r\n    \"email\": \"alishazin1029@gmail.com\",\r\n    \"contact_no\": \"8138830267\",\r\n    \"college\": \"BSA Crescent\"\r\n}\r\n\r\n// only admin can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -423,13 +510,13 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "ae58af86-8364-4a60-94e1-e6abd7e335d6",
+								"value": "a7fe6194-d42f-4030-bd61-7f4bfddf7d72",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"event_id\": \"65edb061a5ddd67dad20d302\",\r\n    \"sub_event_id\": \"65edb098a5ddd67dad20d311\",\r\n    \"contact_no\": \"8138830267\",\r\n    \"college\": \"BSA Crescent\"\r\n}\r\n\r\n// only admin can access this endpoint",
+							"raw": "{\r\n    \"event_id\": \"6613b5d2cce1dcb3cc798054\",\r\n    \"sub_event_id\": \"6613b6a003a450abc82c43cd\",\r\n    \"contact_no\": \"8138830267\",\r\n    \"college\": \"BSA Crescent\"\r\n}\r\n\r\n// only admin can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -459,13 +546,13 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "40b8d584-757f-406c-8ce9-57ba9f5d00ba",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"participant_id\": \"65ecb6161648f4c2c4c734d9\"\r\n}\r\n\r\n// anyone who is part of this event can access this endpoint \r\n// cant be access by hod or admin",
+							"raw": "{\r\n    \"event_id\": \"6613b5d2cce1dcb3cc798054\",\r\n    \"sub_event_id\": \"6613b5f3cce1dcb3cc798059\",\r\n    \"participant_id\": \"661423fb8c4110f978df4489\"\r\n}\r\n\r\n// anyone who is part of this event can access this endpoint \r\n// cant be access by hod or admin",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -530,6 +617,42 @@
 								"api",
 								"participant",
 								"add-csv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Name of Participant",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "a7fe6194-d42f-4030-bd61-7f4bfddf7d72",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Unknown.\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/participant/change-name",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"participant",
+								"change-name"
 							]
 						}
 					},
@@ -602,7 +725,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"to_event\": \"65ec9f39159293c770fb0bfd\",\r\n    \"position\": \"treasurer\", // one of ['treasurer', 'eventmanager', 'volunteer']\r\n    \"to_sub_event\": \"65edb098a5ddd67dad20d311\" // required if position: eventmanager\r\n}\r\n\r\n// can be accessed by any volunteer accounts",
+							"raw": "{\r\n    \"to_event\": \"6613b5d2cce1dcb3cc798054\",\r\n    \"position\": \"volunteer\", // one of ['treasurer', 'eventmanager', 'volunteer']\r\n    \"to_sub_event\": \"65edb098a5ddd67dad20d311\" // required if position: eventmanager\r\n}\r\n\r\n// can be accessed by any volunteer accounts",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -758,7 +881,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"request_id\": \"65f09289f617de1edd0a3dc7\"\r\n}\r\n\r\n// can be accessed by studentcoordinator of event which request belongs to",
+							"raw": "{\r\n    \"request_id\": \"6614253fc83671ad92ffff57\"\r\n}\r\n\r\n// can be accessed by studentcoordinator of event which request belongs to",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1127,7 +1250,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"description\": \"Bill for aws\",\r\n    \"img\": \"https://images.pexels.com/photos/20427618/pexels-photo-20427618/free-photo-of-a-woman-walking-down-a-sidewalk-with-a-blue-and-white-tile-mural.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2\"\r\n}\r\n\r\n// can be uploaded student_coordinator and volunteers(event_managers and volunteers)",
+							"raw": "{\r\n    \"event_id\": \"6613b5d2cce1dcb3cc798054\",\r\n    \"sub_event_id\": \"6613b5f3cce1dcb3cc798059\",\r\n    \"description\": \"Bill for railway\",\r\n    \"img\": \"https://images.pexels.com/photos/20427618/pexels-photo-20427618/free-photo-of-a-woman-walking-down-a-sidewalk-with-a-blue-and-white-tile-mural.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2\",\r\n    \"amount\": 0.01\r\n}\r\n\r\n// can be uploaded student_coordinator and volunteers(event_managers and volunteers)",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1193,13 +1316,13 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "f2bda6aa-723e-47bf-ba1b-4f725df3dd11",
+								"value": "88f6c634-584d-41d4-856a-f3c55b9e936a",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"event_id\": \"65ec9f39159293c770fb0bfd\",\r\n    \"sub_event_id\": \"65eca2bc2dc0f7961ad6bcaf\",\r\n    \"bill_id\": \"6606fdf907e1b1790e2532cb\",\r\n    \"status\": \"accepted\", // accepted or rejected\r\n    \"message\": \"Good one mi amigo\" // not-required\r\n}\r\n\r\n// Can be accessed by the treasurer of the event, can only respond to a bill once",
+							"raw": "{\r\n    \"event_id\": \"6613b5d2cce1dcb3cc798054\",\r\n    \"sub_event_id\": \"6613b5f3cce1dcb3cc798059\",\r\n    \"bill_id\": \"66142641c83671ad92ffff92\",\r\n    \"status\": \"accepted\", // accepted or rejected\r\n    \"message\": \"Good one mi amigo\" // not-required\r\n}\r\n\r\n// Can be accessed by the treasurer of the event, can only respond to a bill once",
 							"options": {
 								"raw": {
 									"language": "json"
