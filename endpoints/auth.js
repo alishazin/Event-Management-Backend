@@ -167,6 +167,13 @@ function logInEndpoint(app, UserModel) {
             })
         }
 
+        if (!utils.validateEmail(email)) {
+            return res.status(400).send({
+                "err_msg": "invalid email",
+                "field": "email"
+            })
+        }
+
         // password validation
 
         if (!utils.checkType(password, String)) {
@@ -178,11 +185,44 @@ function logInEndpoint(app, UserModel) {
 
         // validation
 
+        let newUserCreated = false
         let user = await UserModel.findOne({email: email.trim().toLowerCase()})
-        if (!user) return res.status(400).send({
-            "err_msg": "Invalid credentials",
-            "field": "email && password"
-        })
+        if (!user) {
+
+            const emailSplitted = email.split("@")
+
+            if (emailSplitted.length === 2 && emailSplitted[1].toLowerCase() === "crescent.education") {
+                if (!(/^\d+$/.test(emailSplitted[0]))) {
+                    return res.status(400).send({
+                        "err_msg": "Invalid crescent email. it must of the format <rrn>@crescent.education",
+                        "field": "email"
+                    })
+                }
+            } else {
+                return res.status(400).send({
+                    "err_msg": "Invalid credentials",
+                    "field": "email && password"
+                })
+            }
+
+            if (password === "1234") {
+                user = UserModel({
+                    type: "participant",
+                    email: email,
+                    name: emailSplitted[0],
+                    password: await bcrypt.hash("1234", 10)
+                })
+        
+                await user.save()
+                newUserCreated = true
+            } else {
+                return res.status(400).send({
+                    "err_msg": "Invalid credentials",
+                    "field": "email && password"
+                })
+            }
+
+        }
 
         const result = await bcrypt.compare(password, user.password);
         if (!result) {
@@ -201,7 +241,8 @@ function logInEndpoint(app, UserModel) {
 
         return res.status(200).send({
             session_token: session_token,
-            expiry_after: 86400000 
+            expiry_after: 86400000,
+            newly_created_user: newUserCreated
         })
 
     })

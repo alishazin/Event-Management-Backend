@@ -50,4 +50,4 @@ notification 5 read
 - /summary for event (Total of bills, no. Of participants, organizing team, volunteers)
 - description field for sub-event. DONE
 - img field for event and sub-event. DONE
-- if someone log in with crescent mail (pass: 1234), if it doesnt exist, register them as new user and send session-id.
+- if someone log in with crescent mail (pass: 1234), if it doesnt exist, register them as new user and send session-id. DONE
