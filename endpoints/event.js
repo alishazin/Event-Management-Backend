@@ -455,6 +455,154 @@ function getEventEndpoint(app, UserModel, EventModel) {
 
     })
 
+    app.get("/api/event/summary", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer"]))
+    app.get("/api/event/summary", async (req, res) => {
+
+        const { id } = req.query
+
+        const event = await eventObj.getEventById(id, EventModel)
+        if (!event) {
+            return res.status(400).send({
+                "err_msg": "id is invalid",
+                "field": "id"
+            })
+        }
+
+        if (!(
+            res.locals.userType === "admin" ||
+            (res.locals.userType === "hod" && event.department === res.locals.user.department) ||
+            eventObj.checkIfUserPartOfEvent(res.locals.user._id.toString(), event, {
+                check_studentcoordinator: true
+            })
+        )) {
+            return res.status(400).send({
+                "err_msg": "Hod of the specific department and users who are part of the event can only access this endpoint",
+                "field": ""
+            })
+        }
+
+        const subEventsSummary = []
+        const organizers = []
+        const volunteers = []
+        let total_self_enrolled_participants = 0
+        let total_non_self_enrolled_participants = 0
+        let total_participants_attended = 0
+        let total_accepted_bill_amount = 0
+        let total_waiting_bill_amount = 0
+
+        const student_coordinator = await userObj.getUserById(event.student_coordinator, UserModel)
+        organizers.push({
+            _id: student_coordinator._id,
+            name: _.startCase(student_coordinator.name),
+            position: "Student Coordinator",
+            profile: student_coordinator.profile ? student_coordinator.profile : null,
+        })
+
+        if (event.treasurer) {
+            const treasurer = await userObj.getUserById(event.treasurer, UserModel)
+            organizers.push({
+                _id: treasurer._id,
+                name: _.startCase(treasurer.name),
+                position: "Treasurer",
+                profile: treasurer.profile ? treasurer.profile : null,
+            })
+        }
+
+        for (let sub_event of event.sub_events) {
+
+            let totalAcceptedBillAmount = 0
+            let totalWaitingBillAmount = 0
+
+            let totalSelfEnrolledParticipants = 0
+            let totalNonSelfEnrolledParticipants = 0
+            let totalParticipantsAttended = 0
+
+            if (sub_event.event_manager) {
+                const event_manager = await userObj.getUserById(event.event_manager, UserModel)
+                organizers.push({
+                    _id: event_manager._id,
+                    name: _.startCase(event_manager.name),
+                    position: "Event Manager",
+                    profile: event_manager.profile ? event_manager.profile : null,
+                })
+            }
+
+            for (let bill of sub_event.bills) {
+                if (bill.status === "accepted") {
+                    totalAcceptedBillAmount += bill.amount
+                } else if (bill.status === "waiting") {
+                    totalWaitingBillAmount += bill.amount
+                }
+            }
+
+            for (let participant of sub_event.participants) {
+                if (participant.is_self_enrolled) {
+                    totalSelfEnrolledParticipants += 1
+                } else {
+                    totalNonSelfEnrolledParticipants += 1
+                }
+                if (participant.is_verified) {
+                    totalParticipantsAttended += 1
+                }
+            }
+
+            subEventsSummary.push({
+                _id: sub_event._id,
+                name: _.startCase(sub_event.name),
+                bill: {
+                    total_accepted_bill_amount: totalAcceptedBillAmount,
+                    total_waiting_bill_amount: totalWaitingBillAmount
+                },
+                participant: {
+                    total_self_enrolled_participants: totalSelfEnrolledParticipants,
+                    total_non_self_enrolled_participants: totalNonSelfEnrolledParticipants,
+                    total_participants: totalSelfEnrolledParticipants + totalNonSelfEnrolledParticipants,
+                    total_participants_attended: totalParticipantsAttended
+                }
+            })
+
+            total_accepted_bill_amount += totalAcceptedBillAmount
+            total_waiting_bill_amount += totalWaitingBillAmount
+
+            total_self_enrolled_participants += totalSelfEnrolledParticipants
+            total_non_self_enrolled_participants += totalNonSelfEnrolledParticipants
+            total_participants_attended += totalParticipantsAttended
+
+        }
+
+        for (let volunteer of event.volunteers) {
+            volunteer = await userObj.getUserById(volunteer, UserModel)
+            volunteers.push({
+                _id: volunteer._id,
+                name: _.startCase(volunteer.name),
+                profile: volunteer.profile ? volunteer.profile : null,
+            })
+        }
+
+        return res.status(200).send({
+            sub_events: subEventsSummary,
+            bill: {
+                total_accepted_bill_amount,
+                total_waiting_bill_amount,
+            },
+            participant: {
+                total_self_enrolled_participants,
+                total_non_self_enrolled_participants,
+                total_participants: total_self_enrolled_participants + total_non_self_enrolled_participants,
+                total_participants_attended
+            },
+            organizing_team: {
+                members: organizers,
+                total_members: organizers.length
+            },
+            volunteering_team: {
+                members: volunteers,
+                total_members: volunteers.length
+            },
+        })
+
+    })
+
 
 }
 
