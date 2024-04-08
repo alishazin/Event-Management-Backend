@@ -52,5 +52,5 @@ notification 5 read
 - img field for event and sub-event. DONE
 - if someone log in with crescent mail (pass: 1234), if it doesnt exist, register them as new user and send session-id. DONE
 - add optional profile pic for user. DONE
-- change-name endpoint for participant user
-- change-profile endpoint for all users
+- change-name endpoint for participant user. DONE
+- change-profile endpoint for all users. DONE

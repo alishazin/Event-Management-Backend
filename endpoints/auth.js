@@ -14,6 +14,7 @@ function initialize(app, UserModel, EventModel) {
     logInEndpoint(app, UserModel)
     verifySessionTokenEndpoint(app, UserModel, EventModel)
     changePasswordEndpoint(app, UserModel)
+    changeProfileEndpoint(app, UserModel)
 
 }
 
@@ -454,6 +455,47 @@ function changePasswordEndpoint(app, UserModel) {
         const hash = await bcrypt.hash(new_password, 10);
 
         res.locals.user.password = hash
+        await res.locals.user.save()
+
+        res.status(200).send(userObj.toObject(res.locals.user))
+
+    })
+
+}
+
+function changeProfileEndpoint(app, UserModel) {
+
+    app.patch("/api/auth/change-profile", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator", "volunteer", "participant"]))
+    app.patch("/api/auth/change-profile", async (req, res) => {
+
+        let { profile } = req.body
+
+        // profile validation
+
+        if (profile !== null && profile !== undefined) {
+
+            if (!utils.checkType(profile, String)) {
+                return res.status(400).send({
+                    "err_msg": "profile must be a string",
+                    "field": "profile"
+                })
+            }
+    
+            if (!utils.isUrl(profile)) {
+                return res.status(400).send({
+                    "err_msg": "profile must be either a url or base64",
+                    "field": "profile"
+                })
+            }
+    
+            if (utils.isUrl(profile) && utils.isBase64(profile)) {
+                const [location, key] = await s3Client.uploadBase64(profile, "user-profile")
+                profile = location
+            }
+
+        }
+
+        res.locals.user.profile = (profile !== null && profile !== undefined) ? profile : undefined
         await res.locals.user.save()
 
         res.status(200).send(userObj.toObject(res.locals.user))

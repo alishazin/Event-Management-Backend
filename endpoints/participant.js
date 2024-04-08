@@ -504,6 +504,46 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
 
     })
 
+    app.patch("/api/participant/change-name", authMiddleware.restrictAccess(app, UserModel, ["participant"]))
+    app.patch("/api/participant/change-name", async (req, res) => {
+
+        const { name } = req.body
+
+        // Required field validation
+        
+        validator = utils.validateRequired([name], ["name"])
+        if (!validator.is_valid) {
+            return res.status(400).send({
+                "err_msg": validator.err_msg,
+                "field": validator.err_msg.split(" ")[0]
+            })
+        } 
+
+        // name validation
+
+        if (!utils.checkType(name, String)) {
+            return res.status(400).send({
+                "err_msg": "name must be a string",
+                "field": "name"
+            })
+        }
+
+        validator = utils.checkTrimmedLength(name, 3, 30, "name")
+        if (!validator.is_valid) {
+            return res.status(400).send({
+                "err_msg": validator.err_msg,
+                "field": "name"
+            })
+        }
+
+        res.locals.user.name = name
+
+        await res.locals.user.save()
+
+        res.status(200).send(userObj.toObject(res.locals.user))
+
+    })
+
 }
 
 function validateCsv(csv_file, sub_event) {
