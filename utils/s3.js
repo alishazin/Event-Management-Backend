@@ -3,10 +3,7 @@ const { Upload } = require("@aws-sdk/lib-storage")
 const { S3 } = require("@aws-sdk/client-s3")
 const { v4: uuidv4 } = require('uuid')
 
-async function uploadBase64(photoBase64) {
-
-    const folder = "bill-img"
-
+async function uploadBase64(photoBase64, folder) {
     // const photoBase64Data = new Buffer.from(photoBase64.replace(/^data:image\/\w+;base64,/, ""), 'base64')
     const photoBase64Data = new Buffer.from(photoBase64.split("base64,")[1], 'base64')
 

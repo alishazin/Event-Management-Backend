@@ -7,6 +7,7 @@ const eventObj = require("../schemas/event.js")
 const utils = require("../utils/utils.js")
 const { v4: uuidv4 } = require('uuid')
 const _ = require('lodash')
+const s3Client = require("../utils/s3.js")
 
 function initialize(app, UserModel, EventModel) {
 
@@ -22,10 +23,11 @@ function createEventEndpoint(app, UserModel, EventModel) {
     app.post("/api/event/create", async (req, res) => {
 
         const { name, date_from, date_to, department } = req.body;
+        let { img } = req.body;
 
         // Required field validation
         
-        validator = utils.validateRequired([name, date_from, department], ["name", "date_from", "department"])
+        validator = utils.validateRequired([name, date_from, department, img], ["name", "date_from", "department", "img"])
         if (!validator.is_valid) {
             return res.status(400).send({
                 "err_msg": validator.err_msg,
@@ -95,7 +97,6 @@ function createEventEndpoint(app, UserModel, EventModel) {
 
         }
 
-
         // department validation
 
         if (!utils.checkType(department, String)) {
@@ -112,11 +113,33 @@ function createEventEndpoint(app, UserModel, EventModel) {
             })
         }
 
+        // img validation
+
+        if (!utils.checkType(img, String)) {
+            return res.status(400).send({
+                "err_msg": "img must be a string",
+                "field": "img"
+            })
+        }
+
+        if (!utils.isUrl(img)) {
+            return res.status(400).send({
+                "err_msg": "img must be either a url or base64",
+                "field": "img"
+            })
+        }
+
+        if (utils.isUrl(img) && utils.isBase64(img)) {
+            const [location, key] = await s3Client.uploadBase64(img, "event-img")
+            img = location
+        }
+
         const event = new EventModel({
             name: name,
             date_from: dateFromObj,
             date_to: (date_to !== null && date_to !== undefined) ? dateToObj : undefined,
             department: department,
+            img: img,
             student_coordinator: res.locals.user._id
         })
 
@@ -132,11 +155,11 @@ function createSubEventEndpoint(app, UserModel, EventModel) {
     app.post("/api/sub-event/create", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator"]))
     app.post("/api/sub-event/create", async (req, res) => {
 
-        const { event_id, name } = req.body;
+        let { event_id, name, description, img } = req.body;
 
         // Required field validation
         
-        validator = utils.validateRequired([event_id, name], ["event_id", "name"])
+        validator = utils.validateRequired([event_id, name, description, img], ["event_id", "name", "description", "img"])
         if (!validator.is_valid) {
             return res.status(400).send({
                 "err_msg": validator.err_msg,
@@ -192,13 +215,57 @@ function createSubEventEndpoint(app, UserModel, EventModel) {
             })
         }
 
+        // description validation
+
+        if (!utils.checkType(description, String)) {
+            return res.status(400).send({
+                "err_msg": "description must be a string",
+                "field": "description"
+            })
+        }
+
+        validator = utils.checkTrimmedLength(description, 3, 1000, "description")
+        if (!validator.is_valid) {
+            return res.status(400).send({
+                "err_msg": validator.err_msg,
+                "field": "description"
+            })
+        }
+
+        // img validation
+
+        if (!utils.checkType(img, String)) {
+            return res.status(400).send({
+                "err_msg": "img must be a string",
+                "field": "img"
+            })
+        }
+
+        if (!utils.isUrl(img)) {
+            return res.status(400).send({
+                "err_msg": "img must be either a url or base64",
+                "field": "img"
+            })
+        }
+
+        if (utils.isUrl(img) && utils.isBase64(img)) {
+            const [location, key] = await s3Client.uploadBase64(img, "sub-event-img")
+            img = location
+        }
+
         event.sub_events.push({
-            name: name
+            name: name,
+            description: description,
+            img: img
         })
 
         await event.save()
 
-        res.send(await eventObj.toObject(event, UserModel, res.locals.user._id.toString()))
+        res.send(await eventObj.toObject(event, UserModel, res.locals.user._id.toString(), {
+            include_sub_event_participants: false,
+            include_sub_event_bills: false,
+            include_sub_event_your_bills: false
+        }))
 
     })
 

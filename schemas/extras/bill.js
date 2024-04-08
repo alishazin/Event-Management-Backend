@@ -18,7 +18,7 @@ const billSchema = mongoose.Schema({
     },
     amount: {
         type: Number,
-        default: 0,
+        default: 0, // should be removed
         required: true
     },
     status: {

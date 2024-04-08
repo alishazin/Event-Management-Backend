@@ -98,7 +98,7 @@ function initialize(app, UserModel, EventModel) {
         }
 
         if (utils.isUrl(img) && utils.isBase64(img)) {
-            const [location, key] = await s3Client.uploadBase64(img)
+            const [location, key] = await s3Client.uploadBase64(img, "bill-img")
             img = location
         }
 
