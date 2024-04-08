@@ -6,6 +6,7 @@ const users = require("../schemas/extras/users.js")
 const userObj = require("../schemas/user.js")
 const utils = require("../utils/utils.js")
 const { v4: uuidv4 } = require('uuid')
+const s3Client = require("../utils/s3.js")
 
 function initialize(app, UserModel, EventModel) {
 
@@ -13,6 +14,7 @@ function initialize(app, UserModel, EventModel) {
     logInEndpoint(app, UserModel)
     verifySessionTokenEndpoint(app, UserModel, EventModel)
     changePasswordEndpoint(app, UserModel)
+    changeProfileEndpoint(app, UserModel)
 
 }
 
@@ -24,6 +26,7 @@ function createUserEndpoint(app, UserModel) {
         const {
             type, email, name, password, department
         } = req.body
+        let { profile } = req.body
 
         // Required field validation
 
@@ -128,10 +131,37 @@ function createUserEndpoint(app, UserModel) {
 
         }
 
+        // profile validation
+
+        if (profile !== null && profile !== undefined) {
+
+            if (!utils.checkType(profile, String)) {
+                return res.status(400).send({
+                    "err_msg": "profile must be a string",
+                    "field": "profile"
+                })
+            }
+    
+            if (!utils.isUrl(profile)) {
+                return res.status(400).send({
+                    "err_msg": "profile must be either a url or base64",
+                    "field": "profile"
+                })
+            }
+    
+            if (utils.isUrl(profile) && utils.isBase64(profile)) {
+                const [location, key] = await s3Client.uploadBase64(profile, "user-profile")
+                profile = location
+            }
+
+        }
+
+
         const user = UserModel({
             type: type,
             email: email,
             name: name,
+            profile: (profile !== null && profile !== undefined) ? profile : undefined,
             password: hash,
             department: type === "hod" ? department : undefined
         })
@@ -167,6 +197,13 @@ function logInEndpoint(app, UserModel) {
             })
         }
 
+        if (!utils.validateEmail(email)) {
+            return res.status(400).send({
+                "err_msg": "invalid email",
+                "field": "email"
+            })
+        }
+
         // password validation
 
         if (!utils.checkType(password, String)) {
@@ -178,11 +215,44 @@ function logInEndpoint(app, UserModel) {
 
         // validation
 
+        let newUserCreated = false
         let user = await UserModel.findOne({email: email.trim().toLowerCase()})
-        if (!user) return res.status(400).send({
-            "err_msg": "Invalid credentials",
-            "field": "email && password"
-        })
+        if (!user) {
+
+            const emailSplitted = email.split("@")
+
+            if (emailSplitted.length === 2 && emailSplitted[1].toLowerCase() === "crescent.education") {
+                if (!(/^\d+$/.test(emailSplitted[0]))) {
+                    return res.status(400).send({
+                        "err_msg": "Invalid crescent email. it must of the format <rrn>@crescent.education",
+                        "field": "email"
+                    })
+                }
+            } else {
+                return res.status(400).send({
+                    "err_msg": "Invalid credentials",
+                    "field": "email && password"
+                })
+            }
+
+            if (password === "1234") {
+                user = UserModel({
+                    type: "participant",
+                    email: email,
+                    name: emailSplitted[0],
+                    password: await bcrypt.hash("1234", 10)
+                })
+        
+                await user.save()
+                newUserCreated = true
+            } else {
+                return res.status(400).send({
+                    "err_msg": "Invalid credentials",
+                    "field": "email && password"
+                })
+            }
+
+        }
 
         const result = await bcrypt.compare(password, user.password);
         if (!result) {
@@ -201,7 +271,8 @@ function logInEndpoint(app, UserModel) {
 
         return res.status(200).send({
             session_token: session_token,
-            expiry_after: 86400000 
+            expiry_after: 86400000,
+            newly_created_user: newUserCreated
         })
 
     })
@@ -384,6 +455,47 @@ function changePasswordEndpoint(app, UserModel) {
         const hash = await bcrypt.hash(new_password, 10);
 
         res.locals.user.password = hash
+        await res.locals.user.save()
+
+        res.status(200).send(userObj.toObject(res.locals.user))
+
+    })
+
+}
+
+function changeProfileEndpoint(app, UserModel) {
+
+    app.patch("/api/auth/change-profile", authMiddleware.restrictAccess(app, UserModel, ["studentcoordinator", "volunteer", "participant"]))
+    app.patch("/api/auth/change-profile", async (req, res) => {
+
+        let { profile } = req.body
+
+        // profile validation
+
+        if (profile !== null && profile !== undefined) {
+
+            if (!utils.checkType(profile, String)) {
+                return res.status(400).send({
+                    "err_msg": "profile must be a string",
+                    "field": "profile"
+                })
+            }
+    
+            if (!utils.isUrl(profile)) {
+                return res.status(400).send({
+                    "err_msg": "profile must be either a url or base64",
+                    "field": "profile"
+                })
+            }
+    
+            if (utils.isUrl(profile) && utils.isBase64(profile)) {
+                const [location, key] = await s3Client.uploadBase64(profile, "user-profile")
+                profile = location
+            }
+
+        }
+
+        res.locals.user.profile = (profile !== null && profile !== undefined) ? profile : undefined
         await res.locals.user.save()
 
         res.status(200).send(userObj.toObject(res.locals.user))

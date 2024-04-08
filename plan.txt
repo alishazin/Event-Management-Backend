@@ -30,3 +30,27 @@ Who can view the participants list (each sub event will have it):
 except user, other return values will have null values filled to retain the structure
 
 Add event-specific position in the /verify-user
+
+---- new dean ----
+
+- notification for each users
+- event_managers can create announcements (notification send to all the volunteers in that sub-event)
+- when a new event is created, all participant_accounts will get notification 
+
+notification 1
+notification 2
+notification 3
+notification 4 read
+notification 5 read
+
+- when getting all notification, make status to 'read'
+- when getting all unread notification, dont make status 'read'
+
+- amount field in bill. DONE
+- /summary for event (Total of bills, no. Of participants, organizing team, volunteers). DONE
+- description field for sub-event. DONE
+- img field for event and sub-event. DONE
+- if someone log in with crescent mail (pass: 1234), if it doesnt exist, register them as new user and send session-id. DONE
+- add optional profile pic for user. DONE
+- change-name endpoint for participant user. DONE
+- change-profile endpoint for all users. DONE

@@ -15,6 +15,17 @@ function initialize() {
             trim: true,
             lowercase: true,
         },
+        description: {
+            type: String,
+            // required: false, // should be changed
+            required: true, 
+            trim: true
+        },
+        img: {
+            type: String,
+            // required: false // should be changed
+            required: true 
+        },
         event_manager: {
             type: mongoose.Types.ObjectId,
             required: false
@@ -37,6 +48,11 @@ function initialize() {
         date_to: {
             type: Date,
             required: false, // required only if event is for multiple days
+        },
+        img: {
+            type: String,
+            // required: false // should be changed
+            required: true
         },
         student_coordinator: {
             type: mongoose.Types.ObjectId,
@@ -94,6 +110,8 @@ async function subEventToObject(obj, UserModel, user_id, {
     return {
         _id: obj._id,
         name: _.startCase(obj.name),
+        description: obj.description,
+        img: obj.img,
         event_manager: include_event_manager ? 
             (obj.event_manager ? userObj.toObject(await userObj.getById(obj.event_manager, UserModel)) : undefined)
             : undefined,
@@ -123,6 +141,7 @@ async function toObject(
         date_from: obj.date_from,
         date_to: obj.date_to ? obj.date_to : null,
         department: obj.department,
+        img: obj.img,
         student_coordinator: include_student_coordinator ? 
             (obj.student_coordinator ? userObj.toObject(await userObj.getById(obj.student_coordinator, UserModel)) : null)
             : undefined,
