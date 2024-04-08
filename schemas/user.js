@@ -23,6 +23,10 @@ const hodSchema = mongoose.Schema({
         trim: true,
         lowercase: true,
     },
+    profile: {
+        type: String,
+        required: false
+    },
     password: {
         type: String,
         required: true,
@@ -52,6 +56,7 @@ function toObject(obj, include_session_token) {
         type: obj.type,
         email: obj.email,
         name: _.startCase(obj.name),
+        profile: obj.profile ? obj.profile : null,
         department: obj.department,
         session_token: include_session_token ? obj.session_token.token : undefined 
     }

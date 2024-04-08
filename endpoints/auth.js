@@ -6,6 +6,7 @@ const users = require("../schemas/extras/users.js")
 const userObj = require("../schemas/user.js")
 const utils = require("../utils/utils.js")
 const { v4: uuidv4 } = require('uuid')
+const s3Client = require("../utils/s3.js")
 
 function initialize(app, UserModel, EventModel) {
 
@@ -24,6 +25,7 @@ function createUserEndpoint(app, UserModel) {
         const {
             type, email, name, password, department
         } = req.body
+        let { profile } = req.body
 
         // Required field validation
 
@@ -128,10 +130,37 @@ function createUserEndpoint(app, UserModel) {
 
         }
 
+        // profile validation
+
+        if (profile !== null && profile !== undefined) {
+
+            if (!utils.checkType(profile, String)) {
+                return res.status(400).send({
+                    "err_msg": "profile must be a string",
+                    "field": "profile"
+                })
+            }
+    
+            if (!utils.isUrl(profile)) {
+                return res.status(400).send({
+                    "err_msg": "profile must be either a url or base64",
+                    "field": "profile"
+                })
+            }
+    
+            if (utils.isUrl(profile) && utils.isBase64(profile)) {
+                const [location, key] = await s3Client.uploadBase64(profile, "user-profile")
+                profile = location
+            }
+
+        }
+
+
         const user = UserModel({
             type: type,
             email: email,
             name: name,
+            profile: (profile !== null && profile !== undefined) ? profile : undefined,
             password: hash,
             department: type === "hod" ? department : undefined
         })
