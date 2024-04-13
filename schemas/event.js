@@ -112,6 +112,7 @@ async function subEventToObject(obj, UserModel, user_id, {
         name: _.startCase(obj.name),
         description: obj.description,
         img: obj.img,
+        participants_count: obj.participants.length,
         event_manager: include_event_manager ? 
             (obj.event_manager ? userObj.toObject(await userObj.getById(obj.event_manager, UserModel)) : undefined)
             : undefined,
