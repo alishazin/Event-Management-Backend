@@ -5,7 +5,7 @@ const sessionToken = require("./extras/session-token.js")
 const departments = require("./extras/departments.js")
 const users = require("./extras/users.js")
 
-const hodSchema = mongoose.Schema({
+const userSchema = mongoose.Schema({
     type: {
         type: String,
         enum: users,
@@ -27,6 +27,11 @@ const hodSchema = mongoose.Schema({
         type: String,
         required: false
     },
+    contact_no: {
+        type: String,
+        required: false,
+        trim: true
+    },
     password: {
         type: String,
         required: true,
@@ -44,7 +49,7 @@ const hodSchema = mongoose.Schema({
 
 function initialize() {
 
-    const UserModel = mongoose.model("User", hodSchema)
+    const UserModel = mongoose.model("User", userSchema)
 
     return UserModel
 
@@ -57,6 +62,7 @@ function toObject(obj, include_session_token) {
         email: obj.email,
         name: _.startCase(obj.name),
         profile: obj.profile ? obj.profile : null,
+        contact_no: obj.type === "participant" ? (obj.contact_no ? obj.contact_no : null) : undefined,
         department: obj.department,
         session_token: include_session_token ? obj.session_token.token : undefined 
     }
@@ -81,7 +87,7 @@ async function getUserById(id, UserModel) {
 
 module.exports = {
     initialize: initialize, 
-    schema: hodSchema, 
+    schema: userSchema, 
     toObject: toObject, 
     getById: getById,
     getUserById: getUserById

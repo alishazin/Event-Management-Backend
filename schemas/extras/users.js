@@ -1,4 +1,4 @@
 
 module.exports = [
-    'hod', 'volunteer', 'studentcoordinator', 'participant'
+    'hod', 'dean', 'volunteer', 'studentcoordinator', 'participant'
 ]

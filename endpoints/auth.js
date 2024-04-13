@@ -106,7 +106,7 @@ function createUserEndpoint(app, UserModel) {
 
         // department validation
 
-        if (type === "hod") {
+        if (type === "hod" || type === "dean") {
 
             if (department === null || department === undefined) {
                 return res.status(400).send({
@@ -163,7 +163,7 @@ function createUserEndpoint(app, UserModel) {
             name: name,
             profile: (profile !== null && profile !== undefined) ? profile : undefined,
             password: hash,
-            department: type === "hod" ? department : undefined
+            department: type === "hod" || type === "dean" ? department : undefined
         })
 
         await user.save()
@@ -321,6 +321,7 @@ function verifySessionTokenEndpoint(app, UserModel, EventModel) {
 
         const all_events = await EventModel.find()
         const events_as_hod = []
+        const events_as_dean = []
         const events_as_studentcoordinator = []
         const events_as_treasurer = []
         const events_as_eventmanager = []
@@ -332,6 +333,16 @@ function verifySessionTokenEndpoint(app, UserModel, EventModel) {
             for (let event of all_events) {
                 if (event.department === user.department) {
                     events_as_hod.push(event._id.toString())
+                }
+            }    
+
+        }
+
+        if (user.type === "dean") {
+
+            for (let event of all_events) {
+                if (event.department === user.department) {
+                    events_as_dean.push(event._id.toString())
                 }
             }    
 
@@ -409,6 +420,7 @@ function verifySessionTokenEndpoint(app, UserModel, EventModel) {
         return res.status(200).send({
             ...userObj.toObject(user),
             events_as_hod : events_as_hod,
+            events_as_dean : events_as_dean,
             events_as_studentcoordinator : events_as_studentcoordinator,
             events_as_treasurer : events_as_treasurer,
             events_as_eventmanager : events_as_eventmanager,
@@ -422,7 +434,7 @@ function verifySessionTokenEndpoint(app, UserModel, EventModel) {
 
 function changePasswordEndpoint(app, UserModel) {
 
-    app.post("/api/auth/change-password", authMiddleware.restrictAccess(app, UserModel, ["hod", "studentcoordinator", "volunteer", "participant"]))
+    app.post("/api/auth/change-password", authMiddleware.restrictAccess(app, UserModel, ["hod", "dean", "studentcoordinator", "volunteer", "participant"]))
     app.post("/api/auth/change-password", async (req, res) => {
 
         const { old_password, new_password } = req.body

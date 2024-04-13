@@ -22,7 +22,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"type\": \"volunteer\", // one of [studentcoordinator, volunteer, hod, participant]\r\n    \"email\": \"dejong@gmail.com\",\r\n    \"name\": \"De Jong\",\r\n    \"s\": \"https://images.pexels.com/photos/20732688/pexels-photo-20732688/free-photo-of-man-in-suit-standing-in-lake.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2\",\r\n    \"password\": \"12345678\",\r\n    \"department\": \"cse\" // only required for type: hod\r\n}\r\n\r\n// only admin can access this endpoint",
+							"raw": "{\r\n    \"type\": \"dean\", // one of [studentcoordinator, volunteer, hod, dean, participant]\r\n    \"email\": \"deancse@gmail.com\",\r\n    \"name\": \"CSE Dean\",\r\n    \"s\": \"https://images.pexels.com/photos/20732688/pexels-photo-20732688/free-photo-of-man-in-suit-standing-in-lake.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2\",\r\n    \"password\": \"12345678\",\r\n    \"department\": \"cse\" // only required for type: hod\r\n}\r\n\r\n// only admin can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -52,7 +52,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"220071601032@crescent.education\",\r\n    \"password\": \"1234\"\r\n}\r\n\r\n// all users can access this endpoint",
+							"raw": "{\r\n    \"email\": \"deancse@gmail.com\",\r\n    \"password\": \"12345678\"\r\n}\r\n\r\n// all users can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -88,7 +88,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"session_token\": \"a7fe6194-d42f-4030-bd61-7f4bfddf7d72\"\r\n}\r\n\r\n// all users can access this endpoint\r\n\r\n// events_as_studentcoordinator, events_as_treasurer, events_as_eventmanager, events_as_participant and events_as_volunteer contains ID of events which this user is part of",
+							"raw": "{\r\n    \"session_token\": \"c516709e-20a6-492c-a161-ebbac0b4d48c\"\r\n}\r\n\r\n// all users can access this endpoint\r\n\r\n// events_as_studentcoordinator, events_as_treasurer, events_as_eventmanager, events_as_participant and events_as_volunteer contains ID of events which this user is part of",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -118,7 +118,7 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "7f98db6e-2ac5-4fd0-8037-96dd9e5da779",
+								"value": "c516709e-20a6-492c-a161-ebbac0b4d48c",
 								"type": "text"
 							}
 						],
@@ -201,7 +201,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Carnival\",\r\n    \"date_from\": \"2024-04-11\",\r\n    \"date_to\": \"2024-04-13\", // exclude this field if the event is for a day\r\n    \"department\": \"cse\",\r\n    \"img\": \"https://images.pexels.com/photos/20732688/pexels-photo-20732688/free-photo-of-man-in-suit-standing-in-lake.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2\"\r\n}\r\n\r\n// only studentcoordinator accounts can access this endpoint",
+							"raw": "{\r\n    \"name\": \"Carnival 2\",\r\n    \"date_from\": \"2024-05-11\",\r\n    \"date_to\": \"2024-05-13\", // exclude this field if the event is for a day\r\n    \"department\": \"cse\",\r\n    \"img\": \"https://images.pexels.com/photos/20732688/pexels-photo-20732688/free-photo-of-man-in-suit-standing-in-lake.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2\"\r\n}\r\n\r\n// only studentcoordinator accounts can access this endpoint",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -401,6 +401,63 @@
 								{
 									"key": "date",
 									"value": "2024-03-11"
+								},
+								{
+									"key": "include_sub_events",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Event By Date Copy",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "d11b7721-ca3a-4932-834a-742eeb8bcf2b",
+								"type": "text"
+							},
+							{
+								"key": "admin-access-code",
+								"value": "044453c2-e45a-4c5d-91b5-c3c14a483d61",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://event-management-backend.up.railway.app/api/event/get-on-date?date=2024-04-17&include_sub_events=1",
+							"protocol": "https",
+							"host": [
+								"event-management-backend",
+								"up",
+								"railway",
+								"app"
+							],
+							"path": [
+								"api",
+								"event",
+								"get-on-date"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2024-04-17"
 								},
 								{
 									"key": "include_sub_events",
@@ -629,13 +686,13 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "a7fe6194-d42f-4030-bd61-7f4bfddf7d72",
+								"value": "e77f4fec-6364-49a4-934d-1d9dbefd74f2",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Unknown.\"\r\n}",
+							"raw": "{\r\n    \"name\": \"Cubarsi\",\r\n    \"contact_no\": \"1234567890\" // optional\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"

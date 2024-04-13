@@ -273,7 +273,7 @@ function createSubEventEndpoint(app, UserModel, EventModel) {
 
 function getEventEndpoint(app, UserModel, EventModel) {
 
-    app.get("/api/event/get-all", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer", "participant"]))
+    app.get("/api/event/get-all", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "dean", "studentcoordinator", "volunteer", "participant"]))
     app.get("/api/event/get-all", async (req, res) => {
 
         const resData = []
@@ -298,7 +298,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
 
     })
 
-    app.get("/api/event/get-one", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer", "participant"]))
+    app.get("/api/event/get-one", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "dean", "studentcoordinator", "volunteer", "participant"]))
     app.get("/api/event/get-one", async (req, res) => {
 
         const { id } = req.query
@@ -314,6 +314,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
         if (
             res.locals.userType === "admin" ||
             (res.locals.userType === "hod" && event.department === res.locals.user.department) ||
+            (res.locals.userType === "dean" && event.department === res.locals.user.department) ||
             (res.locals.userType === "studentcoordinator" && event.student_coordinator?.toString() === res.locals.user._id.toString()) ||
             (res.locals.userType === "volunteer" && event.treasurer?.toString() === res.locals.user._id.toString())
         ) {
@@ -387,7 +388,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
 
     })
 
-    app.get("/api/event/get-on-date", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer", "participant"]))
+    app.get("/api/event/get-on-date", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "dean", "studentcoordinator", "volunteer", "participant"]))
     app.get("/api/event/get-on-date", async (req, res) => {
 
         const { date, include_sub_events } = req.query
@@ -455,7 +456,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
 
     })
 
-    app.get("/api/event/summary", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer"]))
+    app.get("/api/event/summary", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "dean", "studentcoordinator", "volunteer"]))
     app.get("/api/event/summary", async (req, res) => {
 
         const { id } = req.query
@@ -471,12 +472,13 @@ function getEventEndpoint(app, UserModel, EventModel) {
         if (!(
             res.locals.userType === "admin" ||
             (res.locals.userType === "hod" && event.department === res.locals.user.department) ||
+            (res.locals.userType === "dean" && event.department === res.locals.user.department) ||
             eventObj.checkIfUserPartOfEvent(res.locals.user._id.toString(), event, {
                 check_studentcoordinator: true
             })
         )) {
             return res.status(400).send({
-                "err_msg": "Hod of the specific department and users who are part of the event can only access this endpoint",
+                "err_msg": "Hod/Dean of the specific department and users who are part of the event can only access this endpoint",
                 "field": ""
             })
         }

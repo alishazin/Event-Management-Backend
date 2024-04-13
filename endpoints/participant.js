@@ -121,7 +121,7 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
         if (!validator.is_valid) {
             return res.status(400).send({
                 "err_msg": validator.err_msg,
-                "field": "name"
+                "field": "contact_no"
             })
         }
 
@@ -447,7 +447,7 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
 
     })
 
-    app.get("/api/participant/get-all", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer"]))
+    app.get("/api/participant/get-all", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "dean", "studentcoordinator", "volunteer"]))
     app.get("/api/participant/get-all", async (req, res) => {
 
         const { event_id, sub_event_id } = req.query
@@ -475,6 +475,7 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
         if (!(
             res.locals.userType === "admin" ||
             (res.locals.userType === "hod" && event.department === res.locals.user.department) ||
+            (res.locals.userType === "dean" && event.department === res.locals.user.department) ||
             eventObj.checkIfUserPartOfEvent(res.locals.user._id.toString(), event, {
                 check_studentcoordinator: true
             })
@@ -507,7 +508,7 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
     app.patch("/api/participant/change-name", authMiddleware.restrictAccess(app, UserModel, ["participant"]))
     app.patch("/api/participant/change-name", async (req, res) => {
 
-        const { name } = req.body
+        const { name, contact_no } = req.body
 
         // Required field validation
         
@@ -537,6 +538,29 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
         }
 
         res.locals.user.name = name
+
+        // contact_no validation
+
+        if (contact_no !== null && contact_no !== undefined) {
+
+            if (!utils.checkType(contact_no, String)) {
+                return res.status(400).send({
+                    "err_msg": "contact_no must be a string",
+                    "field": "contact_no"
+                })
+            }
+    
+            validator = utils.checkTrimmedLength(contact_no, 10, 12, "contact_no")
+            if (!validator.is_valid) {
+                return res.status(400).send({
+                    "err_msg": validator.err_msg,
+                    "field": "contact_no"
+                })
+            }
+
+            res.locals.user.contact_no = contact_no
+
+        }
 
         await res.locals.user.save()
 

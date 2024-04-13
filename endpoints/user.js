@@ -8,7 +8,7 @@ const event = require("./event.js")
 
 function initialize(app, UserModel, EventModel) {
 
-    app.get("/api/user/get-all-volunteers", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator"]))
+    app.get("/api/user/get-all-volunteers", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "dean", "studentcoordinator"]))
     app.get("/api/user/get-all-volunteers", async (req, res) => {
 
         const returnData = []
@@ -21,7 +21,7 @@ function initialize(app, UserModel, EventModel) {
 
     })
 
-    app.get("/api/user/get-all-studentcoordinators", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod"]))
+    app.get("/api/user/get-all-studentcoordinators", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "dean"]))
     app.get("/api/user/get-all-studentcoordinators", async (req, res) => {
 
         const returnData = []
