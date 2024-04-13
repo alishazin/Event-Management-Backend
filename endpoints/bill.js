@@ -320,7 +320,7 @@ function initialize(app, UserModel, EventModel) {
 
     })
 
-    app.get("/api/bill/get-all", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer"]))
+    app.get("/api/bill/get-all", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "dean", "studentcoordinator", "volunteer"]))
     app.get("/api/bill/get-all", async (req, res) => {
 
         const { event_id, sub_event_id } = req.query
@@ -348,6 +348,7 @@ function initialize(app, UserModel, EventModel) {
         if (!(
             res.locals.userType === "admin" ||
             (res.locals.userType === "hod" && event.department === res.locals.user.department) ||
+            (res.locals.userType === "dean" && event.department === res.locals.user.department) ||
             eventObj.checkIfUserPartOfEvent(res.locals.user._id.toString(), event, {
                 check_studentcoordinator: true
             })
@@ -371,6 +372,7 @@ function initialize(app, UserModel, EventModel) {
         if (
             res.locals.userType === "admin" ||
             (res.locals.userType === "hod" && event.department === res.locals.user.department) ||
+            (res.locals.userType === "dean" && event.department === res.locals.user.department) ||
             (res.locals.userType === "studentcoordinator" && event.student_coordinator?.toString() === res.locals.user._id.toString()) ||
             (res.locals.userType === "volunteer" && event.treasurer?.toString() === res.locals.user._id.toString()) ||
             (res.locals.userType === "volunteer" && sub_event.event_manager?.toString() === res.locals.user._id.toString())

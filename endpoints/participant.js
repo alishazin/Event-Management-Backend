@@ -447,7 +447,7 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
 
     })
 
-    app.get("/api/participant/get-all", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "studentcoordinator", "volunteer"]))
+    app.get("/api/participant/get-all", authMiddleware.restrictAccess(app, UserModel, ["admin", "hod", "dean", "studentcoordinator", "volunteer"]))
     app.get("/api/participant/get-all", async (req, res) => {
 
         const { event_id, sub_event_id } = req.query
@@ -475,6 +475,7 @@ function createParticipantEndpoint(app, UserModel, EventModel) {
         if (!(
             res.locals.userType === "admin" ||
             (res.locals.userType === "hod" && event.department === res.locals.user.department) ||
+            (res.locals.userType === "dean" && event.department === res.locals.user.department) ||
             eventObj.checkIfUserPartOfEvent(res.locals.user._id.toString(), event, {
                 check_studentcoordinator: true
             })

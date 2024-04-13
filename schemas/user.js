@@ -5,7 +5,7 @@ const sessionToken = require("./extras/session-token.js")
 const departments = require("./extras/departments.js")
 const users = require("./extras/users.js")
 
-const hodSchema = mongoose.Schema({
+const userSchema = mongoose.Schema({
     type: {
         type: String,
         enum: users,
@@ -49,7 +49,7 @@ const hodSchema = mongoose.Schema({
 
 function initialize() {
 
-    const UserModel = mongoose.model("User", hodSchema)
+    const UserModel = mongoose.model("User", userSchema)
 
     return UserModel
 
@@ -87,7 +87,7 @@ async function getUserById(id, UserModel) {
 
 module.exports = {
     initialize: initialize, 
-    schema: hodSchema, 
+    schema: userSchema, 
     toObject: toObject, 
     getById: getById,
     getUserById: getUserById
