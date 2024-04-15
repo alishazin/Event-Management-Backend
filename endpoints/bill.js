@@ -394,6 +394,82 @@ function initialize(app, UserModel, EventModel) {
 
     })
 
+    app.patch("/api/bill/is-hard-copy-submitted", authMiddleware.restrictAccess(app, UserModel, ["volunteer"]))
+    app.patch("/api/bill/is-hard-copy-submitted", async (req, res) => {
+
+        const { event_id, sub_event_id, bill_id, is_hard_copy_submitted } = req.body
+
+        // Required field validation
+        
+        validator = utils.validateRequired([event_id, sub_event_id, bill_id, is_hard_copy_submitted], ["event_id", "sub_event_id", "bill_id", "is_hard_copy_submitted"])
+        if (!validator.is_valid) {
+            return res.status(400).send({
+                "err_msg": validator.err_msg,
+                "field": validator.err_msg.split(" ")[0]
+            })
+        }
+
+        // event_id validation
+
+        const event = await eventObj.getEventById(event_id, EventModel);
+        if (!event) {
+            return res.status(400).send({
+                "err_msg": "invalid event_id",
+                "field": "event_id"
+            })
+        }
+
+        if (event.treasurer.toString() !== res.locals.user._id.toString()) {
+            return res.status(400).send({
+                "err_msg": "only treasurer can respond to a bill",
+                "field": "event_id"
+            })
+        }
+
+        // sub_event_id validation
+
+        const sub_event = eventObj.getSubEventById(sub_event_id, event);
+        if (!sub_event) {
+            return res.status(400).send({
+                "err_msg": "invalid sub_event_id",
+                "field": "sub_event_id"
+            })
+        }
+
+        // bill_id validation
+
+        const bill = billObj.getBillFromSubEventById(bill_id, sub_event);
+        if (!bill) {
+            return res.status(400).send({
+                "err_msg": "invalid bill_id",
+                "field": "bill_id"
+            })
+        }
+        
+        if (bill.status !== "accepted") {
+            return res.status(400).send({
+                "err_msg": "You have to accept the bill inorder to edit is_hard_copy_submitted",
+                "field": "bill_id"
+            })
+        }
+
+        // is_hard_copy_submitted validation
+
+        if (!utils.checkType(is_hard_copy_submitted, Boolean)) {
+            return res.status(400).send({
+                "err_msg": "is_hard_copy_submitted must be a boolean",
+                "field": "is_hard_copy_submitted"
+            })
+        }
+
+        bill.is_hard_copy_submitted = is_hard_copy_submitted
+
+        await event.save()
+
+        return res.status(200).send(await billObj.toObject(bill, UserModel))
+
+    })
+
 }
 
 module.exports = { initialize: initialize }

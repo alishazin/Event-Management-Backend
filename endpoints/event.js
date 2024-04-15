@@ -486,6 +486,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
         const subEventsSummary = []
         const organizers = []
         const volunteers = []
+        const volunteersSeparated = {}
         let total_self_enrolled_participants = 0
         let total_non_self_enrolled_participants = 0
         let total_participants_attended = 0
@@ -507,6 +508,23 @@ function getEventEndpoint(app, UserModel, EventModel) {
                 name: _.startCase(treasurer.name),
                 position: "Treasurer",
                 profile: treasurer.profile ? treasurer.profile : null,
+            })
+        }
+
+        for (let volunteerWrapper of event.volunteers) {
+            const volunteer = await userObj.getUserById(volunteerWrapper, UserModel)
+            volunteers.push({
+                _id: volunteer._id,
+                name: _.startCase(volunteer.name),
+                profile: volunteer.profile ? volunteer.profile : null,
+            })
+            if (volunteersSeparated[volunteerWrapper.sub_event_id.toString()] === undefined) {
+                volunteersSeparated[volunteerWrapper.sub_event_id.toString()] = []
+            }
+            volunteersSeparated[volunteerWrapper.sub_event_id.toString()].push({
+                _id: volunteer._id,
+                name: _.startCase(volunteer.name),
+                profile: volunteer.profile ? volunteer.profile : null,
             })
         }
 
@@ -560,6 +578,10 @@ function getEventEndpoint(app, UserModel, EventModel) {
                     total_non_self_enrolled_participants: totalNonSelfEnrolledParticipants,
                     total_participants: totalSelfEnrolledParticipants + totalNonSelfEnrolledParticipants,
                     total_participants_attended: totalParticipantsAttended
+                },
+                volunteering_team: {
+                    members: volunteersSeparated[sub_event._id.toString()] ? volunteersSeparated[sub_event._id.toString()] : [],
+                    total_members: volunteersSeparated[sub_event._id.toString()] ? volunteersSeparated[sub_event._id.toString()].length : 0
                 }
             })
 
@@ -570,15 +592,6 @@ function getEventEndpoint(app, UserModel, EventModel) {
             total_non_self_enrolled_participants += totalNonSelfEnrolledParticipants
             total_participants_attended += totalParticipantsAttended
 
-        }
-
-        for (let volunteer of event.volunteers) {
-            volunteer = await userObj.getUserById(volunteer, UserModel)
-            volunteers.push({
-                _id: volunteer._id,
-                name: _.startCase(volunteer.name),
-                profile: volunteer.profile ? volunteer.profile : null,
-            })
         }
 
         return res.status(200).send({

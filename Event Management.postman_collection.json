@@ -782,7 +782,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"to_event\": \"6613b5d2cce1dcb3cc798054\",\r\n    \"position\": \"volunteer\", // one of ['treasurer', 'eventmanager', 'volunteer']\r\n    \"to_sub_event\": \"65edb098a5ddd67dad20d311\" // required if position: eventmanager\r\n}\r\n\r\n// can be accessed by any volunteer accounts",
+							"raw": "{\r\n    \"to_event\": \"6613b5d2cce1dcb3cc798054\",\r\n    \"position\": \"volunteer\", // one of ['treasurer', 'eventmanager', 'volunteer']\r\n    \"to_sub_event\": \"6613b5f3cce1dcb3cc798059\" // required if position: eventmanager or volunteer\r\n}\r\n\r\n// can be accessed by any volunteer accounts",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -938,7 +938,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"request_id\": \"6614253fc83671ad92ffff57\"\r\n}\r\n\r\n// can be accessed by studentcoordinator of event which request belongs to",
+							"raw": "{\r\n    \"request_id\": \"661d6d50cc985dcbb7264cbf\"\r\n}\r\n\r\n// can be accessed by studentcoordinator of event which request belongs to",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1009,13 +1009,13 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "a2728c82-52e2-4d10-b483-d2b8f454099d",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"from_event\": \"65edb061a5ddd67dad20d302\",\r\n    \"from_sub_event\": \"65eca2cd2dc0f7961ad6bcb8\",\r\n    \"to_user\": \"65f098ab4c0812433c983340\",\r\n    \"position\": \"treasurer\"\r\n}\r\n\r\n// Can be accessed by the event student_coordinator, only student_coordinator can send invitations",
+							"raw": "{\r\n    \"from_event\": \"6613b5d2cce1dcb3cc798054\",\r\n    \"from_sub_event\": \"6613b6a003a450abc82c43cd\",\r\n    \"to_user\": \"65ed7c6a63900c8d015dd838\",\r\n    \"position\": \"volunteer\"\r\n}\r\n\r\n// Can be accessed by the event student_coordinator, only student_coordinator can send invitations",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1165,13 +1165,13 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "061072b5-0c32-4b04-96e5-66a2f662bf30",
+								"value": "9e20b645-a2e0-4a91-b260-cc3edee24cc6",
 								"type": "text"
 							}
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"invitation_id\": \"65f1911cc424ff739e6d86f9\"\r\n}\r\n\r\n// can be accessed by volunteer of which ivitation is to",
+							"raw": "{\r\n    \"invitation_id\": \"661d6fa658f1b08bd974378e\"\r\n}\r\n\r\n// can be accessed by volunteer of which ivitation is to",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1403,6 +1403,42 @@
 					"response": []
 				},
 				{
+					"name": "Edit is_hard_copy_submitted",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "session_token",
+								"value": "88f6c634-584d-41d4-856a-f3c55b9e936a",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"event_id\": \"6613b5d2cce1dcb3cc798054\",\r\n    \"sub_event_id\": \"6613b5f3cce1dcb3cc798059\",\r\n    \"bill_id\": \"661425dcc83671ad92ffff75\",\r\n    \"is_hard_copy_submitted\": true // true or false\r\n}\r\n\r\n// Can be accessed by the treasurer of the event, can only respond to a bill once",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/bill/is-hard-copy-submitted",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"bill",
+								"is-hard-copy-submitted"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Get All Bills",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -1412,7 +1448,7 @@
 						"header": [
 							{
 								"key": "session_token",
-								"value": "f2bda6aa-723e-47bf-ba1b-4f725df3dd11",
+								"value": "769607ec-09d6-4af5-83ca-9a9d4b0eeb2c",
 								"type": "text"
 							}
 						],
@@ -1426,7 +1462,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:3000/api/bill/get-all?event_id=65ec9f39159293c770fb0bfd&sub_event_id=65eca2bc2dc0f7961ad6bcaf",
+							"raw": "http://localhost:3000/api/bill/get-all?event_id=6613b5d2cce1dcb3cc798054&sub_event_id=6613b5f3cce1dcb3cc798059",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -1440,11 +1476,11 @@
 							"query": [
 								{
 									"key": "event_id",
-									"value": "65ec9f39159293c770fb0bfd"
+									"value": "6613b5d2cce1dcb3cc798054"
 								},
 								{
 									"key": "sub_event_id",
-									"value": "65eca2bc2dc0f7961ad6bcaf"
+									"value": "6613b5f3cce1dcb3cc798059"
 								}
 							]
 						}

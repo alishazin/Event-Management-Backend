@@ -34,6 +34,17 @@ function initialize() {
         bills: [billObj.schema],
     })
 
+    const volunteerWrapperSchema = mongoose.Schema({
+        _id: {
+            required: true,
+            type: mongoose.Types.ObjectId
+        },
+        sub_event_id: {
+            required: true,
+            type: mongoose.Types.ObjectId
+        },
+    })
+
     const eventSchema = mongoose.Schema({
         name: {
             type: String,
@@ -68,7 +79,7 @@ function initialize() {
             required: false
         },
         sub_events: [subEventSchema],
-        volunteers: [mongoose.Types.ObjectId]
+        volunteers: [volunteerWrapperSchema]
     })
 
     const EventModel = mongoose.model("Event", eventSchema)
@@ -150,7 +161,10 @@ async function toObject(
             (obj.treasurer ? userObj.toObject(await userObj.getById(obj.treasurer, UserModel)) : null)
             : undefined,
         volunteers: include_volunteers ? await Promise.all(obj.volunteers.map(async (volunteer) => {
-            return userObj.toObject(await userObj.getById(volunteer, UserModel), false)
+            return {
+                ...userObj.toObject(await userObj.getById(volunteer._id, UserModel), false),
+                sub_event_id: volunteer.sub_event_id
+            }
         })) : undefined,
         sub_events: include_sub_events ? await Promise.all(obj.sub_events.map(async (sub_event) => {
             return await subEventToObject(sub_event, UserModel, user_id, {
