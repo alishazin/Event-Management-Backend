@@ -61,11 +61,11 @@ function initialize(app, UserModel, EventModel, InvitationModel) {
         // from_sub_event validation
         
         let sub_event;
-        if (position === "eventmanager") {
+        if (position === "eventmanager" || position === "volunteer") {
 
             if (from_sub_event === null || from_sub_event === undefined) {
                 return res.status(400).send({
-                    "err_msg": "from_sub_event is a required field (since position='eventmanager')",
+                    "err_msg": "from_sub_event is a required field (since position='eventmanager' || position='volunteer')",
                     "field": "from_sub_event"
                 })
             }
@@ -138,7 +138,7 @@ function initialize(app, UserModel, EventModel, InvitationModel) {
             invitation_to: to_user_obj._id,
             from_event: event._id,
             position: position,
-            from_sub_event: position === "eventmanager" ? sub_event._id : undefined,
+            from_sub_event: (position === "eventmanager" || position === "volunteer") ? sub_event._id : undefined,
         })
 
         await invitation.save()
@@ -317,7 +317,19 @@ function initialize(app, UserModel, EventModel, InvitationModel) {
 
         } else if (invitation.position === "volunteer") {
 
-            event.volunteers.push(invitation_to_user._id)
+            sub_event = eventObj.getSubEventById(invitation.from_sub_event.toString(), event)
+
+            if (sub_event.event_manager) {
+                return res.status(400).send({
+                    "err_msg": "sub event already has a eventmanager",
+                    "field": ""
+                })
+            }
+
+            event.volunteers.push({
+                _id: invitation_to_user._id,
+                sub_event_id: sub_event._id
+            })
 
         }
 

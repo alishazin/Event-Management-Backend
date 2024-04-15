@@ -30,6 +30,11 @@ const billSchema = mongoose.Schema({
         type: String,
         required: false,
     },
+    is_hard_copy_submitted: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
     bill_uploaded_date: {
         type: Date,
         required: true,
@@ -70,6 +75,7 @@ async function toObject(obj, UserModel, user_obj = null) {
         description: obj.description,
         amount: obj.amount,
         status: obj.status,
+        is_hard_copy_submitted: obj.is_hard_copy_submitted,
         message_from_treasurer: obj.message_from_treasurer ? obj.message_from_treasurer : null,
         bill_uploaded_date: obj.bill_uploaded_date ? obj.bill_uploaded_date : null,
         bill_responded_date: obj.bill_responded_date ? obj.bill_responded_date : null,

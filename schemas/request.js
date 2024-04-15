@@ -15,7 +15,7 @@ const requestSchema = mongoose.Schema({
     },
     to_sub_event: {
         type: mongoose.Types.ObjectId,
-        required: false // only if position is eventmanager
+        required: false // only if position is eventmanager or volunteer
     },
     position: {
         type: String,
