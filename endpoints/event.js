@@ -538,7 +538,7 @@ function getEventEndpoint(app, UserModel, EventModel) {
             let totalParticipantsAttended = 0
 
             if (sub_event.event_manager) {
-                const event_manager = await userObj.getUserById(event.event_manager, UserModel)
+                const event_manager = await userObj.getUserById(sub_event.event_manager, UserModel)
                 organizers.push({
                     _id: event_manager._id,
                     name: _.startCase(event_manager.name),
