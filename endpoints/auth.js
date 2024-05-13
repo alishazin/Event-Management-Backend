@@ -392,7 +392,7 @@ function verifySessionTokenEndpoint(app, UserModel, EventModel) {
                     }
                 }
                 for (let volunteer of event.volunteers) {
-                    if (volunteer.toString() === user._id.toString()) {
+                    if (volunteer._id.toString() === user._id.toString()) {
                         events_as_volunteer.push(event._id.toString())
                     }
                 }
